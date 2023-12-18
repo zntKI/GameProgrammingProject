@@ -5,8 +5,9 @@ using GXPEngine.Core;
 public class Player : Sprite
 {
 
-    //Jump variables
+    //Vertical movement variables
     private float fallSpeed;
+
     private float jumpHeight;
     private float jumpHeightFirstSection;
     private float jumpHeightSecondSection;
@@ -20,6 +21,9 @@ public class Player : Sprite
 
     private bool isJumping;
 
+    //Horizontal movement variables
+    private float moveSpeed;
+
     public Player(float x, float y) : base("square.png", false)
     {
         this.SetOrigin(width / 2, height / 2);
@@ -30,12 +34,12 @@ public class Player : Sprite
 
     private void InitVariables()
     {
-        //Jump variables
+        //Vertical movement variables
         jumpHeight = game.height / 16 * 2.5f;
         jumpHeightFirstSection = game.height / 16 * 2f;
         jumpHeightSecondSection = jumpHeight - jumpHeightFirstSection;
 
-        jumpTimeMS = 1330;
+        jumpTimeMS = 800;
         jumpTimeSectionMS = jumpTimeMS / 4f;
         jumpTimeMSCounter = 0f;
 
@@ -46,7 +50,10 @@ public class Player : Sprite
         jumpAmountFirstSection = jumpHeightFirstSection / frames;
         jumpAmountSecondSection = jumpHeightSecondSection / frames;
 
-        fallSpeed = jumpAmountFirstSection * 2;
+        fallSpeed = jumpAmountFirstSection * 1.2f;
+
+        //Horizontal movement variables
+        moveSpeed = 6f;
     }
 
     private void Update()
@@ -55,6 +62,8 @@ public class Player : Sprite
             ApplyVerticalMovement();
         else
             ApplyJump();
+
+        ApplyHorizontalMovement();
     }
 
     private void ApplyVerticalMovement()
@@ -96,6 +105,14 @@ public class Player : Sprite
         {
             isJumping = false;
         }
+    }
+
+    private void ApplyHorizontalMovement()
+    {
+        if (Input.GetKey(Key.A))
+            MoveUntilCollision(-moveSpeed, 0);
+        else if (Input.GetKey(Key.D))
+            MoveUntilCollision(moveSpeed, 0);
     }
 }
 
