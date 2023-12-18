@@ -8,6 +8,14 @@ public class MyGame : Game {
 		//Console.WriteLine(targetFps);
 		TestBlock testBlock = new TestBlock(width / 2, height - 32);
         AddChild(testBlock);
+        TestBlock testBlock1 = new TestBlock(width / 2 + 64, height - 32);
+        AddChild(testBlock1);
+        TestBlock testBlock2 = new TestBlock(width / 2 + 64, height - 32 - 64);
+        AddChild(testBlock2);
+        TestBlock testBlock3 = new TestBlock(width / 2 + 64, height - 32 - 128);
+        AddChild(testBlock3);
+        TestBlock testBlock4 = new TestBlock(width / 2 + 64, height - 32 - 192);
+        AddChild(testBlock4);
 
         Player player = new Player(width / 2, height / 2); ;
 		AddChild(player);

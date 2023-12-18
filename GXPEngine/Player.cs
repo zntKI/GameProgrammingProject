@@ -8,15 +8,15 @@ public class Player : Sprite
     //Jump variables
     private float fallSpeed;
     private float jumpHeight;
-    private float jumpHeightFirst;
-    private float jumpHeightSecond;
+    private float jumpHeightFirstSection;
+    private float jumpHeightSecondSection;
 
     private float jumpTimeMS;
     private float jumpTimeSectionMS;
     private float jumpTimeMSCounter;
 
-    private float jumpAmountFirst;
-    private float jumpAmountSecond;
+    private float jumpAmountFirstSection;
+    private float jumpAmountSecondSection;
 
     private bool isJumping;
 
@@ -31,10 +31,9 @@ public class Player : Sprite
     private void InitVariables()
     {
         //Jump variables
-        fallSpeed = 3f;
         jumpHeight = game.height / 16 * 2.5f;
-        jumpHeightFirst = game.height / 16 * 2f;
-        jumpHeightSecond = jumpHeight - jumpHeightFirst;
+        jumpHeightFirstSection = game.height / 16 * 2f;
+        jumpHeightSecondSection = jumpHeight - jumpHeightFirstSection;
 
         jumpTimeMS = 1330;
         jumpTimeSectionMS = jumpTimeMS / 4f;
@@ -44,56 +43,54 @@ public class Player : Sprite
 
         float frames = 60 * (jumpTimeSectionMS / 1000f);
 
-        jumpAmountFirst = jumpHeightFirst / frames;
-        jumpAmountSecond = jumpHeightSecond / frames;
+        jumpAmountFirstSection = jumpHeightFirstSection / frames;
+        jumpAmountSecondSection = jumpHeightSecondSection / frames;
+
+        fallSpeed = jumpAmountFirstSection * 2;
     }
 
     private void Update()
     {
-        Console.WriteLine(game.currentFps);
-        ApplyVerticalMovement();
+        if (!isJumping)
+            ApplyVerticalMovement();
+        else
+            ApplyJump();
     }
 
     private void ApplyVerticalMovement()
     {
-        if (!isJumping)
+        var coll = MoveUntilCollision(0, fallSpeed);
+
+        if (Input.GetKeyDown(Key.SPACE) && coll != null)
         {
-            var coll = MoveUntilCollision(0, fallSpeed);
-
-            if (Input.GetKeyDown(Key.SPACE) && coll != null)
-            {
-                isJumping = true;
-
-                jumpTimeMSCounter = 0;
-            }
+            isJumping = true;
+            jumpTimeMSCounter = 0;
         }
-        else
-        {
-            jumpTimeMSCounter += Time.deltaTime;
-            Console.WriteLine(jumpTimeMSCounter);
+    }
 
-            Jump();
-        }
+    private void ApplyJump()
+    {
+        jumpTimeMSCounter += Time.deltaTime;
+        Jump();
     }
 
     private void Jump()
     {
         if (jumpTimeMSCounter < jumpTimeSectionMS)
         {
-            y -= jumpAmountFirst;
+            y -= jumpAmountFirstSection;
         }
         else if (jumpTimeMSCounter < jumpTimeSectionMS * 2)
         {
-            y -= jumpAmountSecond;
+            y -= jumpAmountSecondSection;
         }
         else if (jumpTimeMSCounter < jumpTimeSectionMS * 3)
         {
-            y += jumpAmountSecond;
+            y += jumpAmountSecondSection;
         }
         else if (jumpTimeMSCounter < jumpTimeMS)
         {
-            //y += jumpAmountFirst;
-            MoveUntilCollision(0, jumpAmountFirst);
+            MoveUntilCollision(0, jumpAmountFirstSection);
         }
         else
         {
