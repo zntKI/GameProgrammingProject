@@ -120,7 +120,7 @@ public class TestBlock : Sprite
 {
     public TestBlock(float x, float y) : base("colors.png", false)
     {
-        this.SetOrigin(width / 2, height / 2);
+        //this.SetOrigin(width / 2, height / 2);
         this.SetXY(x, y);
     }
 }

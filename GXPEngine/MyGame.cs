@@ -5,27 +5,37 @@ using System.Drawing;                           // System.Drawing contains drawi
 public class MyGame : Game {
 	public MyGame() : base(1024, 1024, false, false)     // Create a window that's 800x600 and NOT fullscreen
 	{
-        //Console.WriteLine(targetFps);
-        TestBlock testBlock01 = new TestBlock(width / 2 - 64, height - 32);
-        AddChild(testBlock01);
-        TestBlock testBlock02 = new TestBlock(width / 2 - 128, height - 32);
-        AddChild(testBlock02);
-        TestBlock testBlock03 = new TestBlock(width / 2 - 192, height - 32);
-        AddChild(testBlock03);
-        TestBlock testBlock032 = new TestBlock(width / 2 - 192, height - 32 - 64);
-        AddChild(testBlock032);
-        TestBlock testBlock04 = new TestBlock(width / 2 - 256, height - 32);
-        AddChild(testBlock04);
-        TestBlock testBlock = new TestBlock(width / 2, height - 32);
-        AddChild(testBlock);
-        TestBlock testBlock1 = new TestBlock(width / 2 + 64, height - 32);
-        AddChild(testBlock1);
-        TestBlock testBlock2 = new TestBlock(width / 2 + 128, height - 32);
-        AddChild(testBlock2);
-        TestBlock testBlock3 = new TestBlock(width / 2 + 192, height - 32);
-        AddChild(testBlock3);
-        TestBlock testBlock4 = new TestBlock(width / 2 + 256, height - 32);
-        AddChild(testBlock4);
+        int[,] level = new int[16, 16]
+        {
+            { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        };
+
+        for (int i = 0; i < level.GetLength(0); i++)
+        {
+            for (int j = 0; j < level.GetLength(1); j++)
+            {
+                if (level[i, j] == 1)
+                {
+                    TestBlock testBlock11 = new TestBlock(j * 64, i * 64);
+                    AddChild(testBlock11);
+                }
+            }
+        }
 
         Player player = new Player(width / 2, height / 2); ;
 		AddChild(player);
