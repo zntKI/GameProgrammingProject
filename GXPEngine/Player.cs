@@ -7,6 +7,9 @@ public class Player : Sprite
 
     //Vertical movement variables
     private float fallSpeed;
+    private float wallSlideSpeed;
+    private bool isGrounded;
+    private bool isWalled;
 
     private float jumpHeight;
     private float jumpHeightFirstSection;
@@ -51,6 +54,7 @@ public class Player : Sprite
         jumpAmountSecondSection = jumpHeightSecondSection / frames;
 
         fallSpeed = jumpAmountFirstSection * 1.2f;
+        wallSlideSpeed = fallSpeed * 0.5f;
 
         //Horizontal movement variables
         moveSpeed = 6f;
@@ -58,22 +62,35 @@ public class Player : Sprite
 
     private void Update()
     {
-        if (!isJumping)
-            ApplyVerticalMovement();
-        else
+        if (!isGrounded && isWalled)
+        {
+            isJumping = false;
+            ApplyWallSlide();
+        }
+        else if (isJumping)
             ApplyJump();
+        else
+            ApplyVerticalMovement();
 
         ApplyHorizontalMovement();
     }
+
 
     private void ApplyVerticalMovement()
     {
         var coll = MoveUntilCollision(0, fallSpeed);
 
-        if (Input.GetKeyDown(Key.SPACE) && coll != null)
+        isGrounded = false;
+        if (coll != null)
         {
-            isJumping = true;
-            jumpTimeMSCounter = 0;
+            isGrounded = true;
+
+            if (Input.GetKeyDown(Key.SPACE))
+            {
+                isGrounded = false;
+                isJumping = true;
+                jumpTimeMSCounter = 0;
+            }
         }
     }
 
@@ -109,10 +126,28 @@ public class Player : Sprite
 
     private void ApplyHorizontalMovement()
     {
+        Collision coll = null;
+
         if (Input.GetKey(Key.A))
-            MoveUntilCollision(-moveSpeed, 0);
+            coll = MoveUntilCollision(-moveSpeed, 0);
         else if (Input.GetKey(Key.D))
-            MoveUntilCollision(moveSpeed, 0);
+            coll = MoveUntilCollision(moveSpeed, 0);
+
+        isWalled = false;
+        if (coll != null)
+        {
+            isWalled = true;
+        }
+    }
+
+    private void ApplyWallSlide()
+    {
+        var coll = MoveUntilCollision(0, wallSlideSpeed);
+
+        if (coll != null)
+            isGrounded = true;
+
+        Console.WriteLine("Wall sliding!");
     }
 }
 
