@@ -1,15 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using GXPEngine;
 using GXPEngine.Core;
+
 public class Player : Sprite
 {
+    private enum PlayerState { None, Jump, WallSlide, WallJump, Dash }
+    PlayerState currentState;
 
     //Vertical movement variables
     private float fallSpeed;
     private float wallSlideSpeed;
-    private bool isGrounded;
-    private bool isWalled;
 
     private float jumpHeight;
     private float jumpHeightFirstSection;
@@ -21,8 +22,6 @@ public class Player : Sprite
 
     private float jumpAmountFirstSection;
     private float jumpAmountSecondSection;
-
-    private bool isJumping;
 
     //Horizontal movement variables
     private float moveSpeed;
@@ -37,6 +36,8 @@ public class Player : Sprite
 
     private void InitVariables()
     {
+        currentState = PlayerState.None;
+
         //Vertical movement variables
         jumpHeight = game.height / 16 * 2.5f;
         jumpHeightFirstSection = game.height / 16 * 2f;
@@ -45,8 +46,6 @@ public class Player : Sprite
         jumpTimeMS = 800;
         jumpTimeSectionMS = jumpTimeMS / 4f;
         jumpTimeMSCounter = 0f;
-
-        isJumping = false;
 
         float frames = 60 * (jumpTimeSectionMS / 1000f);
 
@@ -62,35 +61,57 @@ public class Player : Sprite
 
     private void Update()
     {
-        if (!isGrounded && isWalled)
-        {
-            isJumping = false;
-            ApplyWallSlide();
-        }
-        else if (isJumping)
-            ApplyJump();
-        else
-            ApplyVerticalMovement();
+        HandleCurrentState();
 
         ApplyHorizontalMovement();
     }
 
+    private void HandleCurrentState()
+    {
+        switch (currentState)
+        {
+            case PlayerState.Jump:
+                ApplyJump();
+                break;
+            case PlayerState.WallSlide:
+                ApplyWallSlide();
+                break;
+            case PlayerState.WallJump:
+                break;
+            case PlayerState.Dash:
+                break;
+            default:
+                ApplyVerticalMovement();
+                break;
+        }
+    }
+
+    private void SetCurrentState(PlayerState state)
+    {
+        currentState = state;
+        switch (currentState)
+        {
+            case PlayerState.Jump:
+                jumpTimeMSCounter = 0f;
+                break;
+            case PlayerState.WallSlide:
+                break;
+            case PlayerState.WallJump:
+                break;
+            case PlayerState.Dash:
+                break;
+            default:
+                break;
+        }
+    }
 
     private void ApplyVerticalMovement()
     {
         var coll = MoveUntilCollision(0, fallSpeed);
 
-        isGrounded = false;
-        if (coll != null)
+        if (coll != null && Input.GetKeyDown(Key.SPACE))
         {
-            isGrounded = true;
-
-            if (Input.GetKeyDown(Key.SPACE))
-            {
-                isGrounded = false;
-                isJumping = true;
-                jumpTimeMSCounter = 0;
-            }
+            SetCurrentState(PlayerState.Jump);
         }
     }
 
@@ -102,26 +123,30 @@ public class Player : Sprite
 
     private void Jump()
     {
+        float amountToMove;
         if (jumpTimeMSCounter < jumpTimeSectionMS)
         {
-            y -= jumpAmountFirstSection;
+            amountToMove = -jumpAmountFirstSection;
         }
         else if (jumpTimeMSCounter < jumpTimeSectionMS * 2)
         {
-            y -= jumpAmountSecondSection;
+            amountToMove = -jumpAmountSecondSection;
         }
         else if (jumpTimeMSCounter < jumpTimeSectionMS * 3)
         {
-            y += jumpAmountSecondSection;
+            amountToMove = jumpAmountSecondSection;
         }
         else if (jumpTimeMSCounter < jumpTimeMS)
         {
-            MoveUntilCollision(0, jumpAmountFirstSection);
+            amountToMove = jumpAmountFirstSection;
         }
         else
         {
-            isJumping = false;
+            SetCurrentState(PlayerState.None);
+            return;
         }
+
+        MoveUntilCollision(0, amountToMove);
     }
 
     private void ApplyHorizontalMovement()
@@ -133,11 +158,25 @@ public class Player : Sprite
         else if (Input.GetKey(Key.D))
             coll = MoveUntilCollision(moveSpeed, 0);
 
-        isWalled = false;
-        if (coll != null)
+        CheckForWallSliding(coll);
+    }
+
+    private void CheckForWallSliding(Collision coll)
+    {
+        if (coll != null && !IsGrounded())
         {
-            isWalled = true;
+            SetCurrentState(PlayerState.WallSlide);
         }
+        else if (currentState == PlayerState.WallSlide && coll == null)
+        {
+            SetCurrentState(PlayerState.None);
+        }
+    }
+
+    private bool IsGrounded()
+    {
+        //Fix wall sliding bug regarding the not complete collision
+        return GetCollisions().FirstOrDefault(obj => obj.y > this.y) != null;
     }
 
     private void ApplyWallSlide()
@@ -145,9 +184,9 @@ public class Player : Sprite
         var coll = MoveUntilCollision(0, wallSlideSpeed);
 
         if (coll != null)
-            isGrounded = true;
+            SetCurrentState(PlayerState.None);
 
-        Console.WriteLine("Wall sliding!");
+        //Console.WriteLine("Wall sliding!");
     }
 }
 
