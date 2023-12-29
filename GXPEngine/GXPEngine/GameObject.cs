@@ -104,11 +104,11 @@ namespace GXPEngine
 			return overlaps;
         }
 
-		//public GameObject[] GetSurroundingCollisions (bool includeTriggers = true, bool includeSolid = true)
-		//{ 
-		//	return game.GetGameObjectSurroundingCollisions(this, includeTriggers, includeSolid);
-  //      }
-		
+		public GameObject[] GetSurroundingCollisions(bool includeTriggers = true, bool includeSolid = true)
+		{
+			return game.GetGameObjectSurroundingCollisions(this, includeTriggers, includeSolid);
+		}
+
 		//------------------------------------------------------------------------------------------------------------------------
 		//														Render
 		//------------------------------------------------------------------------------------------------------------------------
@@ -116,7 +116,7 @@ namespace GXPEngine
 		/// This function is called by the renderer. You can override it to change this object's rendering behaviour.
 		/// When not inside the GXPEngine package, specify the parameter as GXPEngine.Core.GLContext.
 		/// This function was made public to accomodate split screen rendering. Use SetViewPort for that.
- 		/// </summary>
+		/// </summary>
 		/// <param name='glContext'>
 		/// Gl context, will be supplied by internal caller.
 		/// </param>
@@ -506,7 +506,7 @@ namespace GXPEngine
 		virtual public Collision MoveUntilCollision(float vx, float vy) {
 			x += vx;
 			y += vy;
-			GameObject[] overlaps = GetCollisions (false,true);
+			GameObject[] overlaps = GetSurroundingCollisions (false,true);
 			x -= vx;
 			y -= vy;
 			return MoveUntilCollision (vx, vy, overlaps);

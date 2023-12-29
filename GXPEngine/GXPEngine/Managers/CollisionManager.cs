@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
 
 namespace GXPEngine
 {
@@ -80,7 +81,7 @@ namespace GXPEngine
 		{
 			if (collList == null) collList = colliderList;
 
-			List<GameObject> list = new List<GameObject>();
+            List<GameObject> list = new List<GameObject>();
 			for (int j= collList.Count-1; j>=0; j--) {
 				if (j >= collList.Count) continue; //fix for removal in loop				
 				GameObject other = collList[j];
@@ -91,43 +92,27 @@ namespace GXPEngine
 					}
 				}
 			}
-			return list.ToArray();
+
+            return list.ToArray();
 		}
 
-		//public GameObject[] GetCurrentSurroundingCollisions (GameObject gameObject, bool includeTriggers = true, bool includeSolid = true)
-  //      {
-		//	//        Func<GameObject, bool> Conditions()
-		//	//        {
-		//	//Sprite obj = (Sprite)gameObject;
-		//	//obj.width = obj.width * 2;
-		//	//obj.height = obj.height * 2;
-		//	//obj.HitTest
-		//	//return c =>
-		//	//{
-		//	//	bool fromRight = (c.x <= obj.x + obj.width && c.x > obj.x);
-		//	//	bool fromLeft = (c.x >= obj.x - obj.width && c.x < obj.x);
-		//	//	bool fromWidth = (fromRight || fromLeft) && (c.y > obj.y - obj.height && c.y < obj.y + obj.height);
+		public GameObject[] GetCurrentSurroundingCollisions(GameObject gameObject, bool includeTriggers = true, bool includeSolid = true)
+		{
+			Sprite obj = new Sprite(((Sprite)gameObject).texture);
+			obj.SetOrigin(obj.width / 2, obj.height / 2);
+			obj.SetXY(gameObject.x, gameObject.y);
+			obj.width *= 2;
+			obj.height *= 2;
 
-		//	//                bool fromBottom = (c.x <= obj.x + obj.width && c.x > obj.x) && (c.y > obj.y - obj.height && c.y < obj.y + obj.height);
-		//	//	bool fromTop = (c.x <= obj.x + obj.width && c.x > obj.x) && (c.y > obj.y - obj.height && c.y < obj.y + obj.height);
-		//	//	bool fromHeight = (fromBottom || fromTop) /*&& (c.x > obj)*/;
+			List<GameObject> surrColliderList = colliderList.Where(c => c != obj && obj.HitTest(c)).ToList();
 
+			return GetCurrentCollisions(gameObject, includeTriggers, includeSolid, surrColliderList);
+		}
 
-		//	//                return fromWidth || fromHeight;
-		//	//};
-		//	//        }
-		//	Sprite obj = new Sprite(((Sprite)gameObject).texture);
-		//	obj.width = obj.width * 2;
-		//	obj.height = obj.height * 2;
-		//	List<GameObject> surrColliderList = colliderList.Where(c => c != obj && obj.HitTest(c)).ToList();
-
-		//	return GetCurrentCollisions(gameObject, includeTriggers, includeSolid, surrColliderList);
-  //      }
-
-        //------------------------------------------------------------------------------------------------------------------------
-        //														Add()
-        //------------------------------------------------------------------------------------------------------------------------
-        public void Add(GameObject gameObject) {
+		//------------------------------------------------------------------------------------------------------------------------
+		//														Add()
+		//------------------------------------------------------------------------------------------------------------------------
+		public void Add(GameObject gameObject) {
 			if (collisionLoopActive) {
 				throw new Exception ("Cannot call AddChild for gameobjects during OnCollision - use LateAddChild instead.");
 			}
