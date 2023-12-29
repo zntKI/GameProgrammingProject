@@ -146,7 +146,12 @@ public class Player : Sprite
             return;
         }
 
-        MoveUntilCollision(0, amountToMove);
+        var coll = MoveUntilCollision(0, amountToMove);
+
+        if (coll != null)
+        {
+            SetCurrentState(PlayerState.None);
+        }
     }
 
     private void ApplyHorizontalMovement()
@@ -175,7 +180,6 @@ public class Player : Sprite
 
     private bool IsGrounded(float vx, float vy)
     {
-        //Fix wall sliding bug regarding the not complete collision
         return GetFutureCollisions(vx, vy).FirstOrDefault(obj => obj.y > this.y) != null;
     }
 
