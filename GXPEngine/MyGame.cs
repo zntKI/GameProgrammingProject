@@ -31,7 +31,7 @@ public class MyGame : Game {
             {
                 if (level[i, j] == 1)
                 {
-                    TestBlock testBlock11 = new TestBlock(j * 64, i * 64);
+                    TestBlock testBlock11 = new TestBlock(j * 64 + 32, i * 64 + 32);
                     AddChild(testBlock11);
                 }
             }

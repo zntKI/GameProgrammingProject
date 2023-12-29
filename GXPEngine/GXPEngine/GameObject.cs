@@ -93,6 +93,21 @@ namespace GXPEngine
 		{
 			return game.GetGameObjectCollisions(this, includeTriggers, includeSolid);
 		}
+
+		public GameObject[] GetFutureCollisions(float vx, float vy, bool includeTriggers = false, bool includeSolid = true)
+		{
+            x += vx;
+            y += vy;
+            GameObject[] overlaps = GetCollisions(includeTriggers, includeSolid);
+            x -= vx;
+            y -= vy;
+			return overlaps;
+        }
+
+		//public GameObject[] GetSurroundingCollisions (bool includeTriggers = true, bool includeSolid = true)
+		//{ 
+		//	return game.GetGameObjectSurroundingCollisions(this, includeTriggers, includeSolid);
+  //      }
 		
 		//------------------------------------------------------------------------------------------------------------------------
 		//														Render

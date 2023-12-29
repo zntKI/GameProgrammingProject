@@ -163,7 +163,7 @@ public class Player : Sprite
 
     private void CheckForWallSliding(Collision coll)
     {
-        if (coll != null && !IsGrounded())
+        if (coll != null && !IsGrounded(0, wallSlideSpeed))
         {
             SetCurrentState(PlayerState.WallSlide);
         }
@@ -173,10 +173,10 @@ public class Player : Sprite
         }
     }
 
-    private bool IsGrounded()
+    private bool IsGrounded(float vx, float vy)
     {
         //Fix wall sliding bug regarding the not complete collision
-        return GetCollisions().FirstOrDefault(obj => obj.y > this.y) != null;
+        return GetFutureCollisions(vx, vy).FirstOrDefault(obj => obj.y > this.y) != null;
     }
 
     private void ApplyWallSlide()
@@ -186,7 +186,7 @@ public class Player : Sprite
         if (coll != null)
             SetCurrentState(PlayerState.None);
 
-        //Console.WriteLine("Wall sliding!");
+        Console.WriteLine("Wall sliding!");
     }
 }
 
@@ -194,7 +194,7 @@ public class TestBlock : Sprite
 {
     public TestBlock(float x, float y) : base("colors.png", false)
     {
-        //this.SetOrigin(width / 2, height / 2);
+        this.SetOrigin(width / 2, height / 2);
         this.SetXY(x, y);
     }
 }
