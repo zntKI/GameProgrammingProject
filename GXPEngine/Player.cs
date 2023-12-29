@@ -5,7 +5,7 @@ using GXPEngine.Core;
 
 public class Player : Sprite
 {
-    private enum PlayerState { None, Jump, WallSlide, WallJump, Dash }
+    private enum PlayerState { None, Fall, Jump, WallSlide, WallJump, Dash }
     PlayerState currentState;
 
     //Vertical movement variables
@@ -36,7 +36,7 @@ public class Player : Sprite
 
     private void InitVariables()
     {
-        currentState = PlayerState.None;
+        currentState = PlayerState.Fall;
 
         //Vertical movement variables
         jumpHeight = game.height / 16 * 2.5f;
@@ -62,6 +62,7 @@ public class Player : Sprite
     private void Update()
     {
         HandleCurrentState();
+        Console.WriteLine(currentState);
 
         ApplyHorizontalMovement();
     }
@@ -70,6 +71,9 @@ public class Player : Sprite
     {
         switch (currentState)
         {
+            case PlayerState.Fall:
+                ApplyVerticalMovement();
+                break;
             case PlayerState.Jump:
                 ApplyJump();
                 break;
@@ -81,7 +85,7 @@ public class Player : Sprite
             case PlayerState.Dash:
                 break;
             default:
-                ApplyVerticalMovement();
+                ApplyNoVerticalMovement();
                 break;
         }
     }
@@ -91,6 +95,8 @@ public class Player : Sprite
         currentState = state;
         switch (currentState)
         {
+            case PlayerState.Fall:
+                break;
             case PlayerState.Jump:
                 jumpTimeMSCounter = 0f;
                 break;
@@ -105,13 +111,20 @@ public class Player : Sprite
         }
     }
 
+    private void ApplyNoVerticalMovement()
+    {
+        if (Input.GetKeyDown(Key.SPACE))
+        {
+            SetCurrentState(PlayerState.Jump);
+        }
+    }
+
     private void ApplyVerticalMovement()
     {
         var coll = MoveUntilCollision(0, fallSpeed);
-
-        if (coll != null && Input.GetKeyDown(Key.SPACE))
+        if (coll != null)
         {
-            SetCurrentState(PlayerState.Jump);
+            SetCurrentState(PlayerState.None);
         }
     }
 
@@ -142,7 +155,7 @@ public class Player : Sprite
         }
         else
         {
-            SetCurrentState(PlayerState.None);
+            SetCurrentState(PlayerState.Fall);
             return;
         }
 
@@ -150,7 +163,7 @@ public class Player : Sprite
 
         if (coll != null)
         {
-            SetCurrentState(PlayerState.None);
+            SetCurrentState(PlayerState.Fall);
         }
     }
 
@@ -174,7 +187,7 @@ public class Player : Sprite
         }
         else if (currentState == PlayerState.WallSlide && coll == null)
         {
-            SetCurrentState(PlayerState.None);
+            SetCurrentState(PlayerState.Fall);
         }
     }
 
@@ -188,9 +201,9 @@ public class Player : Sprite
         var coll = MoveUntilCollision(0, wallSlideSpeed);
 
         if (coll != null)
-            SetCurrentState(PlayerState.None);
+            SetCurrentState(PlayerState.Fall);
 
-        Console.WriteLine("Wall sliding!");
+        //Console.WriteLine("Wall sliding!");
     }
 }
 
