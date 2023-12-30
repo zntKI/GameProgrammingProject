@@ -8,6 +8,8 @@ public class Player : Sprite
     private enum PlayerState { None, Fall, Jump, WallSlide, WallJump, Dash }
     PlayerState currentState;
 
+    private Vector2 facingDirection;
+
     //Vertical movement variables
     private float fallSpeed;
     private float wallSlideSpeed;
@@ -26,6 +28,22 @@ public class Player : Sprite
     //Horizontal movement variables
     private float moveSpeed;
 
+    //Dash variables
+    private bool canDash;
+
+    private Vector2 dashDirection;
+
+    private Vector2 dashDistance;
+    private Vector2 dashDistanceFirstSection;
+    private Vector2 dashDistanceSecondSection;
+
+    private float dashTimeMS;
+    private float dashTimeSectionMS;
+    private float dashTimeMSCounter;
+
+    private Vector2 dashAmountFirstSection;
+    private Vector2 dashAmountSecondSection;
+
     public Player(float x, float y) : base("square.png", false)
     {
         this.SetOrigin(width / 2, height / 2);
@@ -37,6 +55,7 @@ public class Player : Sprite
     private void InitVariables()
     {
         currentState = PlayerState.Fall;
+        facingDirection = new Vector2();
 
         //Vertical movement variables
         jumpHeight = game.height / 16 * 2.5f;
@@ -57,14 +76,53 @@ public class Player : Sprite
 
         //Horizontal movement variables
         moveSpeed = 6f;
+
+        //Dash variables
+        canDash = true;
+
+        dashDirection = new Vector2();
+
+        dashDistance = new Vector2(game.height / 16 * 4f, game.height / 16 * 3.5f);
+        dashDistanceFirstSection = new Vector2(game.height / 16 * 3.5f, game.height / 16 * 3f);
+        dashDistanceSecondSection = new Vector2(dashDistance.x - dashDistanceFirstSection.x, dashDistance.y - dashDistanceFirstSection.y);
+
+        dashTimeMS = 450;
+        dashTimeSectionMS = dashTimeMS / 2f;
+        dashTimeMSCounter = 0f;
+
+        frames = 60 * (dashTimeSectionMS / 1000f);
+
+        dashAmountFirstSection = new Vector2(dashDistanceFirstSection.x / frames, dashDistanceFirstSection.y / frames);
+        dashAmountSecondSection = new Vector2(dashDistanceSecondSection.x / frames, dashDistanceSecondSection.y / frames);
     }
 
     private void Update()
     {
+        CheckForInput();
         HandleCurrentState();
-        Console.WriteLine(currentState);
 
         ApplyHorizontalMovement();
+    }
+
+    private void CheckForInput()
+    {
+        if (Input.GetKey(Key.W))
+        {
+            facingDirection.y = -1;
+        }
+        else if (Input.GetKey(Key.S))
+        {
+            facingDirection.y = 1;
+        }
+        else
+        {
+            facingDirection.y = 0;
+        }
+
+        if (Input.GetKeyDown(Key.LEFT_SHIFT) && canDash)
+        {
+            SetCurrentState(PlayerState.Dash);
+        }
     }
 
     private void HandleCurrentState()
@@ -83,6 +141,7 @@ public class Player : Sprite
             case PlayerState.WallJump:
                 break;
             case PlayerState.Dash:
+                ApplyDash();
                 break;
             default:
                 ApplyNoVerticalMovement();
@@ -105,6 +164,9 @@ public class Player : Sprite
             case PlayerState.WallJump:
                 break;
             case PlayerState.Dash:
+                canDash = false;
+                dashTimeMSCounter = 0f;
+                dashDirection = facingDirection;
                 break;
             default:
                 break;
@@ -113,6 +175,15 @@ public class Player : Sprite
 
     private void ApplyNoVerticalMovement()
     {
+        if (!IsGrounded(0, fallSpeed))
+        {
+            SetCurrentState(PlayerState.Fall);
+        }
+        else
+        {
+            canDash = true;
+        }
+
         if (Input.GetKeyDown(Key.SPACE))
         {
             SetCurrentState(PlayerState.Jump);
@@ -172,9 +243,20 @@ public class Player : Sprite
         Collision coll = null;
 
         if (Input.GetKey(Key.A))
+        {
             coll = MoveUntilCollision(-moveSpeed, 0);
+            facingDirection.x = -1;
+        }
         else if (Input.GetKey(Key.D))
+        {
             coll = MoveUntilCollision(moveSpeed, 0);
+            facingDirection.x = 1;
+        }
+        else
+        {
+            //Fix bug with dashing direction
+            facingDirection.x = 0;
+        }
 
         CheckForWallSliding(coll);
     }
@@ -204,6 +286,40 @@ public class Player : Sprite
             SetCurrentState(PlayerState.Fall);
 
         //Console.WriteLine("Wall sliding!");
+    }
+
+    private void ApplyDash()
+    {
+        dashTimeMSCounter += Time.deltaTime;
+        Dash();
+    }
+
+    private void Dash()
+    {
+        //Code depending on the last registered facing direction before the dash
+        Vector2 amountToDash;
+        if (dashTimeMSCounter < dashTimeSectionMS)
+        {
+            amountToDash = new Vector2(dashAmountFirstSection.x, dashAmountFirstSection.y);
+        }
+        else if (dashTimeMSCounter < dashTimeMS)
+        {
+            amountToDash = new Vector2(dashAmountSecondSection.x, dashAmountSecondSection.y);
+        }
+        else
+        {
+            SetCurrentState(PlayerState.Fall);
+            return;
+        }
+
+        amountToDash.x *= dashDirection.x;
+        amountToDash.y *= dashDirection.y;
+        var coll = MoveUntilCollision(amountToDash.x, amountToDash.y);
+
+        if (coll != null)
+        {
+            SetCurrentState(PlayerState.Fall);
+        }
     }
 }
 
