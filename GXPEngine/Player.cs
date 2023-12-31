@@ -27,6 +27,7 @@ public class Player : Sprite
 
     //Horizontal movement variables
     private float moveSpeed;
+    private float currentMoveSpeed;
 
     //Dash variables
     private bool canDash;
@@ -76,6 +77,7 @@ public class Player : Sprite
 
         //Horizontal movement variables
         moveSpeed = 6f;
+        currentMoveSpeed = moveSpeed;
 
         //Dash variables
         canDash = true;
@@ -244,12 +246,12 @@ public class Player : Sprite
 
         if (Input.GetKey(Key.A))
         {
-            coll = MoveUntilCollision(-moveSpeed, 0);
+            coll = MoveUntilCollision(-currentMoveSpeed, 0);
             facingDirection.x = -1;
         }
         else if (Input.GetKey(Key.D))
         {
-            coll = MoveUntilCollision(moveSpeed, 0);
+            coll = MoveUntilCollision(currentMoveSpeed, 0);
             facingDirection.x = 1;
         }
         else
@@ -301,14 +303,17 @@ public class Player : Sprite
         if (dashTimeMSCounter < dashTimeSectionMS)
         {
             amountToDash = new Vector2(dashAmountFirstSection.x, dashAmountFirstSection.y);
+            currentMoveSpeed = moveSpeed * 0.1f;
         }
-        else if (dashTimeMSCounter < dashTimeMS)
-        {
-            amountToDash = new Vector2(dashAmountSecondSection.x, dashAmountSecondSection.y);
-        }
+        //else if (dashTimeMSCounter < dashTimeMS)
+        //{
+        //    amountToDash = new Vector2(dashAmountSecondSection.x, dashAmountSecondSection.y);
+        //    currentMoveSpeed = moveSpeed * 0.5f;
+        //}
         else
         {
             SetCurrentState(PlayerState.Fall);
+            currentMoveSpeed = moveSpeed;
             return;
         }
 
@@ -319,6 +324,7 @@ public class Player : Sprite
         if (coll != null)
         {
             SetCurrentState(PlayerState.Fall);
+            currentMoveSpeed = moveSpeed;
         }
     }
 }
