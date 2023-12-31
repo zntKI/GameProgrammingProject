@@ -8,7 +8,8 @@ public class Player : Sprite
     private enum PlayerState { None, Fall, Jump, WallSlide, WallJump, Dash }
     PlayerState currentState;
 
-    private Vector2 facingDirection;
+    private enum SpriteDirection { Left, Top, Right, Bottom }
+    SpriteDirection spriteDirection;
 
     //Vertical movement variables
     private float fallSpeed;
@@ -56,7 +57,8 @@ public class Player : Sprite
     private void InitVariables()
     {
         currentState = PlayerState.Fall;
-        facingDirection = new Vector2();
+
+        spriteDirection = SpriteDirection.Right;
 
         //Vertical movement variables
         jumpHeight = game.height / 16 * 2.5f;
@@ -108,22 +110,60 @@ public class Player : Sprite
 
     private void CheckForInput()
     {
-        if (Input.GetKey(Key.W))
-        {
-            facingDirection.y = -1;
-        }
-        else if (Input.GetKey(Key.S))
-        {
-            facingDirection.y = 1;
-        }
-        else
-        {
-            facingDirection.y = 0;
-        }
+        CheckInputForDirection();
 
         if (Input.GetKeyDown(Key.LEFT_SHIFT) && canDash)
         {
             SetCurrentState(PlayerState.Dash);
+        }
+    }
+
+    /// <summary>
+    /// Check for input regarding the direction variables for the sprite and dash and sets values to those accordingly
+    /// </summary>
+    private void CheckInputForDirection()
+    {
+        if (Input.GetKeyDown(Key.A))
+        {
+            spriteDirection = SpriteDirection.Left;
+            dashDirection.x = -1;
+        }
+        else if (Input.GetKeyDown(Key.D))
+        {
+            spriteDirection = SpriteDirection.Right;
+            dashDirection.x = 1;
+        }
+
+        if (Input.GetKey(Key.W))
+        {
+            spriteDirection = SpriteDirection.Top;
+            dashDirection.y = -1;
+            if (!Input.GetKey(Key.A) && !Input.GetKey(Key.D))
+            {
+                dashDirection.x = 0;
+            }
+        }
+        else if (Input.GetKey(Key.S))
+        {
+            spriteDirection = SpriteDirection.Bottom;
+            dashDirection.y = 1;
+            if (!Input.GetKey(Key.A) && !Input.GetKey(Key.D))
+            {
+                dashDirection.x = 0;
+            }
+        }
+        else
+        {
+            switch (dashDirection.x)
+            {
+                case -1:
+                    spriteDirection = SpriteDirection.Left;
+                    break;
+                case 1:
+                    spriteDirection = SpriteDirection.Right;
+                    break;
+            }
+            dashDirection.y = 0;
         }
     }
 
@@ -168,16 +208,20 @@ public class Player : Sprite
             case PlayerState.Dash:
                 canDash = false;
                 dashTimeMSCounter = 0f;
-                dashDirection = facingDirection;
                 break;
             default:
                 break;
         }
     }
 
+    /// <summary>
+    /// <para>An equivalent to being grounded</para>
+    /// Called when the current state is set to None
+    /// </summary>
     private void ApplyNoVerticalMovement()
     {
-        if (!IsGrounded(0, fallSpeed))
+        //If falling off a platform
+        if (!IsGrounded(fallSpeed))
         {
             SetCurrentState(PlayerState.Fall);
         }
@@ -192,6 +236,10 @@ public class Player : Sprite
         }
     }
 
+    /// <summary>
+    /// <para>Adding a specified amount to the player's Y coordinate, simulating the effect of gravity</para>
+    /// Called when the current state is set to Fall
+    /// </summary>
     private void ApplyVerticalMovement()
     {
         var coll = MoveUntilCollision(0, fallSpeed);
@@ -201,12 +249,18 @@ public class Player : Sprite
         }
     }
 
+    /// <summary>
+    /// Called when the current state is set to Jump
+    /// </summary>
     private void ApplyJump()
     {
         jumpTimeMSCounter += Time.deltaTime;
         Jump();
     }
 
+    /// <summary>
+    /// Moves the player with an amount depending on the current time period of the jump
+    /// </summary>
     private void Jump()
     {
         float amountToMove;
@@ -234,12 +288,17 @@ public class Player : Sprite
 
         var coll = MoveUntilCollision(0, amountToMove);
 
+        //Stops the jump if an interference with a collider occurres
         if (coll != null)
         {
             SetCurrentState(PlayerState.Fall);
         }
     }
 
+    /// <summary>
+    /// <para>Moves the player horizontally depending on the current input</para>
+    /// Called every frame
+    /// </summary>
     private void ApplyHorizontalMovement()
     {
         Collision coll = null;
@@ -247,25 +306,22 @@ public class Player : Sprite
         if (Input.GetKey(Key.A))
         {
             coll = MoveUntilCollision(-currentMoveSpeed, 0);
-            facingDirection.x = -1;
         }
         else if (Input.GetKey(Key.D))
         {
             coll = MoveUntilCollision(currentMoveSpeed, 0);
-            facingDirection.x = 1;
-        }
-        else
-        {
-            //Fix bug with dashing direction
-            facingDirection.x = 0;
         }
 
         CheckForWallSliding(coll);
     }
 
+    /// <summary>
+    /// Checks if wall sliding is available or if it is not anymore
+    /// </summary>
+    /// <param name="coll">Possible sideways collision with a wall(or null)</param>
     private void CheckForWallSliding(Collision coll)
     {
-        if (coll != null && !IsGrounded(0, wallSlideSpeed))
+        if (coll != null && !IsGrounded(wallSlideSpeed))
         {
             SetCurrentState(PlayerState.WallSlide);
         }
@@ -275,11 +331,20 @@ public class Player : Sprite
         }
     }
 
-    private bool IsGrounded(float vx, float vy)
+    /// <summary>
+    /// Checks for collisions with colliders placed beneath the player
+    /// </summary>
+    /// <param name="vy">The amount to try to increase the position with in order to check for a collision</param>
+    /// <returns>true, if a collision is present</returns>
+    private bool IsGrounded(float vy)
     {
-        return GetFutureCollisions(vx, vy).FirstOrDefault(obj => obj.y > this.y) != null;
+        return GetFutureCollisions(0, vy).FirstOrDefault(obj => obj.y > this.y) != null;
     }
 
+    /// <summary>
+    /// <para>Adding a specified amount to the player's Y coordinate, simulating the effect of wall sliding</para>
+    /// Called when the current state is set to WallSlide
+    /// </summary>
     private void ApplyWallSlide()
     {
         var coll = MoveUntilCollision(0, wallSlideSpeed);
@@ -290,12 +355,18 @@ public class Player : Sprite
         //Console.WriteLine("Wall sliding!");
     }
 
+    /// <summary>
+    /// Called when the current state is set to Dash
+    /// </summary>
     private void ApplyDash()
     {
         dashTimeMSCounter += Time.deltaTime;
         Dash();
     }
 
+    /// <summary>
+    /// Moves the player with an amount depending on the dash direction
+    /// </summary>
     private void Dash()
     {
         //Code depending on the last registered facing direction before the dash
@@ -305,11 +376,6 @@ public class Player : Sprite
             amountToDash = new Vector2(dashAmountFirstSection.x, dashAmountFirstSection.y);
             currentMoveSpeed = moveSpeed * 0.1f;
         }
-        //else if (dashTimeMSCounter < dashTimeMS)
-        //{
-        //    amountToDash = new Vector2(dashAmountSecondSection.x, dashAmountSecondSection.y);
-        //    currentMoveSpeed = moveSpeed * 0.5f;
-        //}
         else
         {
             SetCurrentState(PlayerState.Fall);
@@ -321,6 +387,7 @@ public class Player : Sprite
         amountToDash.y *= dashDirection.y;
         var coll = MoveUntilCollision(amountToDash.x, amountToDash.y);
 
+        //Stops the dash if an interference with a collider occurres
         if (coll != null)
         {
             SetCurrentState(PlayerState.Fall);
