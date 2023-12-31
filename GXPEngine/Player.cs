@@ -13,6 +13,7 @@ public class Player : Sprite
 
     //Vertical movement variables
     private float fallSpeed;
+    private float currentFallSpeed;
     private float wallSlideSpeed;
 
     private float jumpHeight;
@@ -34,17 +35,18 @@ public class Player : Sprite
     private bool canDash;
 
     private Vector2 dashDirection;
+    private Vector2 tempDashDirection;
 
-    private Vector2 dashDistance;
+    //private Vector2 dashDistance;
     private Vector2 dashDistanceFirstSection;
-    private Vector2 dashDistanceSecondSection;
+    //private Vector2 dashDistanceSecondSection;
 
     private float dashTimeMS;
     private float dashTimeSectionMS;
     private float dashTimeMSCounter;
 
     private Vector2 dashAmountFirstSection;
-    private Vector2 dashAmountSecondSection;
+    //private Vector2 dashAmountSecondSection;
 
     public Player(float x, float y) : base("square.png", false)
     {
@@ -75,6 +77,8 @@ public class Player : Sprite
         jumpAmountSecondSection = jumpHeightSecondSection / frames;
 
         fallSpeed = jumpAmountFirstSection * 1.2f;
+        currentFallSpeed = fallSpeed;
+
         wallSlideSpeed = fallSpeed * 0.5f;
 
         //Horizontal movement variables
@@ -85,10 +89,11 @@ public class Player : Sprite
         canDash = true;
 
         dashDirection = new Vector2();
+        tempDashDirection = new Vector2();
 
-        dashDistance = new Vector2(game.height / 16 * 4f, game.height / 16 * 3.5f);
-        dashDistanceFirstSection = new Vector2(game.height / 16 * 3.5f, game.height / 16 * 3f);
-        dashDistanceSecondSection = new Vector2(dashDistance.x - dashDistanceFirstSection.x, dashDistance.y - dashDistanceFirstSection.y);
+        //dashDistance = new Vector2(game.width / 16 * 4f, game.height / 16 * 4f);
+        dashDistanceFirstSection = new Vector2(game.width / 16 * 3.5f, game.height / 16 * 3.5f);
+        //dashDistanceSecondSection = new Vector2(dashDistance.x - dashDistanceFirstSection.x, dashDistance.y - dashDistanceFirstSection.y);
 
         dashTimeMS = 450;
         dashTimeSectionMS = dashTimeMS / 2f;
@@ -97,7 +102,7 @@ public class Player : Sprite
         frames = 60 * (dashTimeSectionMS / 1000f);
 
         dashAmountFirstSection = new Vector2(dashDistanceFirstSection.x / frames, dashDistanceFirstSection.y / frames);
-        dashAmountSecondSection = new Vector2(dashDistanceSecondSection.x / frames, dashDistanceSecondSection.y / frames);
+        //dashAmountSecondSection = new Vector2(dashDistanceSecondSection.x / frames, dashDistanceSecondSection.y / frames);
     }
 
     private void Update()
@@ -126,35 +131,35 @@ public class Player : Sprite
         if (Input.GetKeyDown(Key.A))
         {
             spriteDirection = SpriteDirection.Left;
-            dashDirection.x = -1;
+            tempDashDirection.x = -1;
         }
         else if (Input.GetKeyDown(Key.D))
         {
             spriteDirection = SpriteDirection.Right;
-            dashDirection.x = 1;
+            tempDashDirection.x = 1;
         }
 
         if (Input.GetKey(Key.W))
         {
             spriteDirection = SpriteDirection.Top;
-            dashDirection.y = -1;
+            tempDashDirection.y = -1;
             if (!Input.GetKey(Key.A) && !Input.GetKey(Key.D))
             {
-                dashDirection.x = 0;
+                tempDashDirection.x = 0;
             }
         }
         else if (Input.GetKey(Key.S))
         {
             spriteDirection = SpriteDirection.Bottom;
-            dashDirection.y = 1;
+            tempDashDirection.y = 1;
             if (!Input.GetKey(Key.A) && !Input.GetKey(Key.D))
             {
-                dashDirection.x = 0;
+                tempDashDirection.x = 0;
             }
         }
         else
         {
-            switch (dashDirection.x)
+            switch (tempDashDirection.x)
             {
                 case -1:
                     spriteDirection = SpriteDirection.Left;
@@ -163,7 +168,7 @@ public class Player : Sprite
                     spriteDirection = SpriteDirection.Right;
                     break;
             }
-            dashDirection.y = 0;
+            tempDashDirection.y = 0;
         }
     }
 
@@ -191,12 +196,14 @@ public class Player : Sprite
         }
     }
 
-    private void SetCurrentState(PlayerState state)
+    private void SetCurrentState(PlayerState state, float startingFallSpeed=-1f)
     {
         currentState = state;
         switch (currentState)
         {
             case PlayerState.Fall:
+                if (startingFallSpeed != -1f)
+                    currentFallSpeed = startingFallSpeed;
                 break;
             case PlayerState.Jump:
                 jumpTimeMSCounter = 0f;
@@ -208,6 +215,7 @@ public class Player : Sprite
             case PlayerState.Dash:
                 canDash = false;
                 dashTimeMSCounter = 0f;
+                dashDirection = tempDashDirection;
                 break;
             default:
                 break;
@@ -223,7 +231,7 @@ public class Player : Sprite
         //If falling off a platform
         if (!IsGrounded(fallSpeed))
         {
-            SetCurrentState(PlayerState.Fall);
+            SetCurrentState(PlayerState.Fall, fallSpeed);
         }
         else
         {
@@ -242,7 +250,16 @@ public class Player : Sprite
     /// </summary>
     private void ApplyVerticalMovement()
     {
-        var coll = MoveUntilCollision(0, fallSpeed);
+        if (currentFallSpeed < fallSpeed)
+        {
+            currentFallSpeed += 0.5f;
+        }
+        else
+        {
+            currentFallSpeed = fallSpeed;
+        }
+
+        var coll = MoveUntilCollision(0, currentFallSpeed);
         if (coll != null)
         {
             SetCurrentState(PlayerState.None);
@@ -282,7 +299,7 @@ public class Player : Sprite
         }
         else
         {
-            SetCurrentState(PlayerState.Fall);
+            SetCurrentState(PlayerState.Fall, fallSpeed);
             return;
         }
 
@@ -291,7 +308,7 @@ public class Player : Sprite
         //Stops the jump if an interference with a collider occurres
         if (coll != null)
         {
-            SetCurrentState(PlayerState.Fall);
+            SetCurrentState(PlayerState.Fall, fallSpeed);
         }
     }
 
@@ -327,7 +344,7 @@ public class Player : Sprite
         }
         else if (currentState == PlayerState.WallSlide && coll == null)
         {
-            SetCurrentState(PlayerState.Fall);
+            SetCurrentState(PlayerState.Fall, wallSlideSpeed);
         }
     }
 
@@ -350,7 +367,7 @@ public class Player : Sprite
         var coll = MoveUntilCollision(0, wallSlideSpeed);
 
         if (coll != null)
-            SetCurrentState(PlayerState.Fall);
+            SetCurrentState(PlayerState.None);
 
         //Console.WriteLine("Wall sliding!");
     }
@@ -378,7 +395,7 @@ public class Player : Sprite
         }
         else
         {
-            SetCurrentState(PlayerState.Fall);
+            SetCurrentState(PlayerState.Fall, fallSpeed * 0.2f);
             currentMoveSpeed = moveSpeed;
             return;
         }
@@ -390,7 +407,7 @@ public class Player : Sprite
         //Stops the dash if an interference with a collider occurres
         if (coll != null)
         {
-            SetCurrentState(PlayerState.Fall);
+            SetCurrentState(PlayerState.Fall, fallSpeed * 0.2f);
             currentMoveSpeed = moveSpeed;
         }
     }
