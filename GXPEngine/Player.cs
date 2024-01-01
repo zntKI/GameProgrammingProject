@@ -48,6 +48,17 @@ public class Player : Sprite
     private Vector2 dashAmountFirstSection;
     //private Vector2 dashAmountSecondSection;
 
+    //Wall jump variables
+    private Vector2 wallJumpDistance;
+
+    private float wallJumpTimeMS;
+    private float wallJumpTimeMSCounter;
+
+    private Vector2 wallJumpAmount;
+
+    private enum WallJumpDirection { Left = -1, Right = 1 }
+    private WallJumpDirection wallJumpDirection;
+
     public Player(float x, float y) : base("square.png", false)
     {
         this.SetOrigin(width / 2, height / 2);
@@ -103,6 +114,18 @@ public class Player : Sprite
 
         dashAmountFirstSection = new Vector2(dashDistanceFirstSection.x / frames, dashDistanceFirstSection.y / frames);
         //dashAmountSecondSection = new Vector2(dashDistanceSecondSection.x / frames, dashDistanceSecondSection.y / frames);
+
+        //WallJump variables
+        wallJumpDistance = new Vector2(game.width / 16 * 2.5f, (game.height / 16 * 2.5f) * -1f);
+
+        wallJumpTimeMS = 300f;
+        wallJumpTimeMSCounter = 0f;
+
+        frames = 60 * (wallJumpTimeMS / 1000f);
+
+        wallJumpAmount = new Vector2(wallJumpDistance.x / frames, wallJumpDistance.y / frames);
+
+        wallJumpDirection = WallJumpDirection.Left;
     }
 
     private void Update()
@@ -186,6 +209,7 @@ public class Player : Sprite
                 ApplyWallSlide();
                 break;
             case PlayerState.WallJump:
+                ApplyWallJump();
                 break;
             case PlayerState.Dash:
                 ApplyDash();
@@ -211,6 +235,7 @@ public class Player : Sprite
             case PlayerState.WallSlide:
                 break;
             case PlayerState.WallJump:
+                wallJumpTimeMSCounter = 0f;
                 break;
             case PlayerState.Dash:
                 canDash = false;
@@ -318,18 +343,42 @@ public class Player : Sprite
     /// </summary>
     private void ApplyHorizontalMovement()
     {
+        if (currentState == PlayerState.WallJump)
+        {
+            return;
+        }
+
         Collision coll = null;
+        bool isFacingRight = true;
 
         if (Input.GetKey(Key.A))
         {
             coll = MoveUntilCollision(-currentMoveSpeed, 0);
+            isFacingRight = false;
         }
         else if (Input.GetKey(Key.D))
         {
             coll = MoveUntilCollision(currentMoveSpeed, 0);
+            isFacingRight = true;
         }
 
-        CheckForWallSliding(coll);
+        if (currentState != PlayerState.Dash)
+        {
+            CheckForWallSliding(coll);
+        }
+        if (coll != null)
+        {
+            CheckForWallJump(isFacingRight);
+        }
+    }
+
+    private void CheckForWallJump(bool isFacingRight)
+    {
+        if (Input.GetKeyDown(Key.SPACE) && !IsGrounded(fallSpeed))
+        {
+            SetCurrentState(PlayerState.WallJump);
+            wallJumpDirection = isFacingRight ? WallJumpDirection.Left : WallJumpDirection.Right;
+        }
     }
 
     /// <summary>
@@ -402,13 +451,40 @@ public class Player : Sprite
 
         amountToDash.x *= dashDirection.x;
         amountToDash.y *= dashDirection.y;
-        var coll = MoveUntilCollision(amountToDash.x, amountToDash.y);
+        MoveUntilCollision(amountToDash.x, 0);
+        var coll = MoveUntilCollision(0, amountToDash.y);
 
         //Stops the dash if an interference with a collider occurres
         if (coll != null)
         {
             SetCurrentState(PlayerState.Fall, fallSpeed * 0.2f);
             currentMoveSpeed = moveSpeed;
+        }
+    }
+
+    private void ApplyWallJump()
+    {
+        wallJumpTimeMSCounter += Time.deltaTime;
+        WallJump();
+    }
+
+    private void WallJump()
+    {
+        if (wallJumpTimeMSCounter < wallJumpTimeMS)
+        {
+            Vector2 amountToWallJump = new Vector2(wallJumpAmount.x * (int)wallJumpDirection , wallJumpAmount.y);
+
+            MoveUntilCollision(amountToWallJump.x, 0);
+            var coll = MoveUntilCollision(0, amountToWallJump.y);
+
+            if (coll != null)
+            {
+                SetCurrentState(PlayerState.Fall, fallSpeed * 0.2f);
+            }
+        }
+        else
+        {
+            SetCurrentState(PlayerState.Fall, fallSpeed * 0.2f);
         }
     }
 }
