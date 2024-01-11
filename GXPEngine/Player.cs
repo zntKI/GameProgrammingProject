@@ -2,14 +2,17 @@
 using System.Linq;
 using GXPEngine;
 using GXPEngine.Core;
+using TiledMapParser;
 
-public class Player : Sprite
+public class Player : AnimationSprite
 {
     private enum PlayerState { None, Fall, Jump, WallSlide, WallJump, Dash }
     PlayerState currentState;
 
     private enum SpriteDirection { Left, Top, Right, Bottom }
     SpriteDirection spriteDirection;
+
+    LevelList levelList;
 
     //Vertical movement variables
     private float fallSpeed;
@@ -59,10 +62,10 @@ public class Player : Sprite
     private enum WallJumpDirection { Left = -1, Right = 1 }
     private WallJumpDirection wallJumpDirection;
 
-    public Player(float x, float y) : base("square.png", false)
+    public Player(string imageFile, int cols, int rows, TiledObject obj=null) : base(imageFile, cols, rows)
     {
         this.SetOrigin(width / 2, height / 2);
-        this.SetXY(x, y);
+        SetCycle(1, 4);
 
         InitVariables();
     }
@@ -72,6 +75,8 @@ public class Player : Sprite
         currentState = PlayerState.Fall;
 
         spriteDirection = SpriteDirection.Right;
+
+        levelList = game.FindObjectOfType<LevelList>();
 
         //Vertical movement variables
         jumpHeight = game.height / 16 * 2.5f;
@@ -93,7 +98,7 @@ public class Player : Sprite
         wallSlideSpeed = fallSpeed * 0.5f;
 
         //Horizontal movement variables
-        moveSpeed = 6f;
+        moveSpeed = 1f;
         currentMoveSpeed = moveSpeed;
 
         //Dash variables
@@ -287,6 +292,7 @@ public class Player : Sprite
         var coll = MoveUntilCollision(0, currentFallSpeed);
         if (coll != null)
         {
+            levelList.currentLevel.CheckColl(coll);
             SetCurrentState(PlayerState.None);
         }
     }
@@ -343,10 +349,7 @@ public class Player : Sprite
     /// </summary>
     private void ApplyHorizontalMovement()
     {
-        if (currentState == PlayerState.WallJump)
-        {
-            return;
-        }
+        if (currentState == PlayerState.WallJump) return;
 
         Collision coll = null;
         bool isFacingRight = true;
@@ -355,11 +358,20 @@ public class Player : Sprite
         {
             coll = MoveUntilCollision(-currentMoveSpeed, 0);
             isFacingRight = false;
+
+            Animate(0.05f);
         }
         else if (Input.GetKey(Key.D))
         {
             coll = MoveUntilCollision(currentMoveSpeed, 0);
             isFacingRight = true;
+
+            Animate(0.05f);
+        }
+        else
+        {
+            currentFrame = 1;
+            SetCycle(1, 4);
         }
 
         if (currentState != PlayerState.Dash)
@@ -486,14 +498,5 @@ public class Player : Sprite
         {
             SetCurrentState(PlayerState.Fall, fallSpeed * 0.2f);
         }
-    }
-}
-
-public class TestBlock : Sprite
-{
-    public TestBlock(float x, float y) : base("colors.png", false)
-    {
-        this.SetOrigin(width / 2, height / 2);
-        this.SetXY(x, y);
     }
 }
