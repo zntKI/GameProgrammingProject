@@ -26,12 +26,8 @@ public class Level : GameObject
         tiledLoader.LoadObjectGroups(0);
     }
 
-    public void CheckColl(Collision coll)
-    {
-        if (coll.other is Spikes)
-        {
-            coll.self.LateDestroy();
-            CreateLevel();
-        }
+    public void ReloadLevel()
+    { 
+        CreateLevel();
     }
 }

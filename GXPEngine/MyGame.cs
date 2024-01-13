@@ -68,7 +68,9 @@ public class MyGame : Game {
 public class LevelList : GameObject
 {
     List<Level> levels = new List<Level>();
-	public Level currentLevel;
+    private Level currentLevel;
+
+    public Level CurrentLevel => currentLevel;
 
     public void AddLevel(Level level)
     {

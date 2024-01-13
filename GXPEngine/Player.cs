@@ -64,6 +64,7 @@ public class Player : AnimationSprite
 
     public Player(string imageFile, int cols, int rows, TiledObject obj=null) : base(imageFile, cols, rows)
     {
+        //TODO: fix the bounds of the collider so that its more fair
         this.SetOrigin(width / 2, height / 2);
         SetCycle(1, 4);
 
@@ -292,7 +293,7 @@ public class Player : AnimationSprite
         var coll = MoveUntilCollision(0, currentFallSpeed);
         if (coll != null)
         {
-            levelList.currentLevel.CheckColl(coll);
+            if (CheckColl(coll)) return;
             SetCurrentState(PlayerState.None);
         }
     }
@@ -339,6 +340,7 @@ public class Player : AnimationSprite
         //Stops the jump if an interference with a collider occurres
         if (coll != null)
         {
+            if (CheckColl(coll)) return;
             SetCurrentState(PlayerState.Fall, fallSpeed);
         }
     }
@@ -380,6 +382,7 @@ public class Player : AnimationSprite
         }
         if (coll != null)
         {
+            if (CheckColl(coll)) return;
             CheckForWallJump(isFacingRight);
         }
     }
@@ -401,6 +404,7 @@ public class Player : AnimationSprite
     {
         if (coll != null && !IsGrounded(wallSlideSpeed))
         {
+            if (CheckColl(coll)) return;
             SetCurrentState(PlayerState.WallSlide);
         }
         else if (currentState == PlayerState.WallSlide && coll == null)
@@ -428,7 +432,10 @@ public class Player : AnimationSprite
         var coll = MoveUntilCollision(0, wallSlideSpeed);
 
         if (coll != null)
+        {
+            if (CheckColl(coll)) return;
             SetCurrentState(PlayerState.None);
+        }
 
         //Console.WriteLine("Wall sliding!");
     }
@@ -463,12 +470,14 @@ public class Player : AnimationSprite
 
         amountToDash.x *= dashDirection.x;
         amountToDash.y *= dashDirection.y;
-        MoveUntilCollision(amountToDash.x, 0);
-        var coll = MoveUntilCollision(0, amountToDash.y);
+        var collX = MoveUntilCollision(amountToDash.x, 0);
+        var collY = MoveUntilCollision(0, amountToDash.y);
 
+        if (collX != null && CheckColl(collX)) return;
         //Stops the dash if an interference with a collider occurres
-        if (coll != null)
+        if (collY != null)
         {
+            if (CheckColl(collY)) return;
             SetCurrentState(PlayerState.Fall, fallSpeed * 0.2f);
             currentMoveSpeed = moveSpeed;
         }
@@ -486,11 +495,13 @@ public class Player : AnimationSprite
         {
             Vector2 amountToWallJump = new Vector2(wallJumpAmount.x * (int)wallJumpDirection , wallJumpAmount.y);
 
-            MoveUntilCollision(amountToWallJump.x, 0);
-            var coll = MoveUntilCollision(0, amountToWallJump.y);
+            var collX = MoveUntilCollision(amountToWallJump.x, 0);
+            var collY = MoveUntilCollision(0, amountToWallJump.y);
 
-            if (coll != null)
+            if (collX != null && CheckColl(collX)) return;
+            if (collY != null)
             {
+                if (CheckColl(collY)) return;
                 SetCurrentState(PlayerState.Fall, fallSpeed * 0.2f);
             }
         }
@@ -498,5 +509,24 @@ public class Player : AnimationSprite
         {
             SetCurrentState(PlayerState.Fall, fallSpeed * 0.2f);
         }
+    }
+
+    /// <summary>
+    /// Checks the type of the object with which the collision occured
+    /// </summary>
+    /// <param name="coll">The collision that occured</param>
+    /// <returns>true if level is reloaded, false if not</returns>
+    private bool CheckColl(Collision coll)
+    {
+        if (coll.other is Spikes)
+        {
+            //TODO: check what needs to be done to fix the game slowing down
+            //after a number of times the Player dies - what needs to be done in addition to just deleting it?
+            levelList.CurrentLevel.RemoveChild(this);
+            coll.self.Destroy();
+            levelList.CurrentLevel.ReloadLevel();
+            return true;
+        }
+        return false;
     }
 }
