@@ -5,11 +5,15 @@ using TiledMapParser;
 
 public class Level : GameObject
 {
+    public int Id => id;
+
+    private int id;
 	TiledLoader tiledLoader;
 
-	public Level(string fileName)
+	public Level(string fileName, int id)
 	{
         tiledLoader = new TiledLoader(fileName);
+        this.id = id;
 
 		CreateLevel();
 	}

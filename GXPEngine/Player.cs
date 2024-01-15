@@ -64,6 +64,7 @@ public class Player : AnimationSprite
 
     public Player(string imageFile, int cols, int rows, TiledObject obj=null) : base(imageFile, cols, rows)
     {
+        Console.WriteLine("Player init");
         //TODO: fix the bounds of the collider so that its more fair
         this.SetOrigin(width / 2, height / 2);
         SetCycle(1, 4);
@@ -223,6 +224,16 @@ public class Player : AnimationSprite
             default:
                 ApplyNoVerticalMovement();
                 break;
+        }
+
+        CheckForNextLevel();
+    }
+
+    private void CheckForNextLevel()
+    {
+        if (this.y < 0)
+        {
+            levelList.LoadLevel();
         }
     }
 
@@ -515,11 +526,12 @@ public class Player : AnimationSprite
     /// Checks the type of the object with which the collision occured
     /// </summary>
     /// <param name="coll">The collision that occured</param>
-    /// <returns>true if level is reloaded, false if not</returns>
+    /// <returns>true if level is reloaded, otherwise false</returns>
     private bool CheckColl(Collision coll)
     {
         if (coll.other is Spikes)
         {
+            //TODO: fix player respawning twice
             //TODO: check what needs to be done to fix the game slowing down
             //after a number of times the Player dies - what needs to be done in addition to just deleting it?
             levelList.CurrentLevel.RemoveChild(this);
