@@ -64,7 +64,6 @@ public class Player : AnimationSprite
 
     public Player(string imageFile, int cols, int rows, TiledObject obj=null) : base(imageFile, cols, rows)
     {
-        Console.WriteLine("Player init");
         //TODO: fix the bounds of the collider so that its more fair
         this.SetOrigin(width / 2, height / 2);
         SetCycle(1, 4);
@@ -226,14 +225,18 @@ public class Player : AnimationSprite
                 break;
         }
 
-        CheckForNextLevel();
+        CheckPosition();
     }
 
-    private void CheckForNextLevel()
+    private void CheckPosition()
     {
         if (this.y < 0)
         {
             levelList.LoadLevel();
+        }
+        else if (this.y > game.height)
+        {
+            Die();
         }
     }
 
@@ -534,11 +537,16 @@ public class Player : AnimationSprite
             //TODO: fix player respawning twice
             //TODO: check what needs to be done to fix the game slowing down
             //after a number of times the Player dies - what needs to be done in addition to just deleting it?
-            levelList.CurrentLevel.RemoveChild(this);
-            coll.self.Destroy();
-            levelList.CurrentLevel.ReloadLevel();
+            Die();
             return true;
         }
         return false;
+    }
+
+    private void Die()
+    {
+        levelList.CurrentLevel.RemoveChild(this);
+        Destroy();
+        levelList.CurrentLevel.ReloadLevel();
     }
 }
