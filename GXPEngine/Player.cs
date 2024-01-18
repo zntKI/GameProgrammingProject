@@ -9,9 +9,6 @@ public class Player : AnimationSprite
     private enum PlayerState { None, Fall, Jump, WallSlide, WallJump, Dash }
     PlayerState currentState;
 
-    private enum SpriteDirection { Left, Top, Right, Bottom }
-    SpriteDirection spriteDirection;
-
     LevelList levelList;
 
     //Vertical movement variables
@@ -66,7 +63,6 @@ public class Player : AnimationSprite
     {
         //TODO: fix the bounds of the collider so that its more fair
         this.SetOrigin(width / 2, height / 2);
-        SetCycle(1, 4);
 
         InitVariables();
     }
@@ -74,8 +70,6 @@ public class Player : AnimationSprite
     private void InitVariables()
     {
         currentState = PlayerState.Fall;
-
-        spriteDirection = SpriteDirection.Right;
 
         levelList = game.FindObjectOfType<LevelList>();
 
@@ -140,11 +134,25 @@ public class Player : AnimationSprite
         HandleCurrentState();
 
         ApplyHorizontalMovement();
+
+        Animate();
     }
 
     private void CheckForInput()
     {
         CheckInputForDirection();
+
+        if (Input.GetKeyDown(Key.SPACE))
+        {
+            if (currentState == PlayerState.None)
+            {
+                SetCurrentState(PlayerState.Jump);
+            }
+            else
+            {
+                if (IsWalled()) SetCurrentState(PlayerState.WallJump);
+            }
+        }
 
         if (Input.GetKeyDown(Key.LEFT_SHIFT) && canDash)
         {
@@ -159,18 +167,19 @@ public class Player : AnimationSprite
     {
         if (Input.GetKeyDown(Key.A))
         {
-            spriteDirection = SpriteDirection.Left;
+            Mirror(true, false);
+
             tempDashDirection.x = -1;
         }
         else if (Input.GetKeyDown(Key.D))
         {
-            spriteDirection = SpriteDirection.Right;
+            Mirror(false, false);
+
             tempDashDirection.x = 1;
         }
 
         if (Input.GetKey(Key.W))
         {
-            spriteDirection = SpriteDirection.Top;
             tempDashDirection.y = -1;
             if (!Input.GetKey(Key.A) && !Input.GetKey(Key.D))
             {
@@ -179,7 +188,6 @@ public class Player : AnimationSprite
         }
         else if (Input.GetKey(Key.S))
         {
-            spriteDirection = SpriteDirection.Bottom;
             tempDashDirection.y = 1;
             if (!Input.GetKey(Key.A) && !Input.GetKey(Key.D))
             {
@@ -188,15 +196,6 @@ public class Player : AnimationSprite
         }
         else
         {
-            switch (tempDashDirection.x)
-            {
-                case -1:
-                    spriteDirection = SpriteDirection.Left;
-                    break;
-                case 1:
-                    spriteDirection = SpriteDirection.Right;
-                    break;
-            }
             tempDashDirection.y = 0;
         }
     }
@@ -248,19 +247,30 @@ public class Player : AnimationSprite
             case PlayerState.Fall:
                 if (startingFallSpeed != -1f)
                     currentFallSpeed = startingFallSpeed;
+
+                SetCycle(3);
                 break;
             case PlayerState.Jump:
                 jumpTimeMSCounter = 0f;
+
+                SetCycle(3);
                 break;
             case PlayerState.WallSlide:
+                SetCycle(5);
                 break;
             case PlayerState.WallJump:
+                wallJumpDirection = _mirrorX ? WallJumpDirection.Right : WallJumpDirection.Left;
                 wallJumpTimeMSCounter = 0f;
+
+                Mirror(!_mirrorX, false);
+                SetCycle(3);
                 break;
             case PlayerState.Dash:
                 canDash = false;
                 dashTimeMSCounter = 0f;
                 dashDirection = tempDashDirection;
+
+                SetCycle(3);
                 break;
             default:
                 break;
@@ -283,10 +293,10 @@ public class Player : AnimationSprite
             canDash = true;
         }
 
-        if (Input.GetKeyDown(Key.SPACE))
-        {
-            SetCurrentState(PlayerState.Jump);
-        }
+        //if (Input.GetKeyDown(Key.SPACE))
+        //{
+        //    SetCurrentState(PlayerState.Jump);
+        //}
     }
 
     /// <summary>
@@ -368,46 +378,30 @@ public class Player : AnimationSprite
         if (currentState == PlayerState.WallJump) return;
 
         Collision coll = null;
-        bool isFacingRight = true;
-
         if (Input.GetKey(Key.A))
         {
             coll = MoveUntilCollision(-currentMoveSpeed, 0);
-            isFacingRight = false;
-
-            Animate(0.05f);
+            SetCycle(1, 4, 20);
         }
         else if (Input.GetKey(Key.D))
         {
             coll = MoveUntilCollision(currentMoveSpeed, 0);
-            isFacingRight = true;
-
-            Animate(0.05f);
+            SetCycle(1, 4, 20);
         }
         else
         {
-            currentFrame = 1;
-            SetCycle(1, 4);
+            if (Input.GetKey(Key.W) && currentState != PlayerState.Dash)
+                SetCycle(7);
+            else if (Input.GetKey(Key.S) && currentState != PlayerState.Dash)
+                SetCycle(6);
+            else if (currentState == PlayerState.None)
+                SetCycle(1);
         }
 
-        if (currentState != PlayerState.Dash)
-        {
-            CheckForWallSliding(coll);
-        }
+        CheckForWallSliding(coll);
+
         if (coll != null)
-        {
-            if (CheckColl(coll)) return;
-            CheckForWallJump(isFacingRight);
-        }
-    }
-
-    private void CheckForWallJump(bool isFacingRight)
-    {
-        if (Input.GetKeyDown(Key.SPACE) && !IsGrounded(fallSpeed))
-        {
-            SetCurrentState(PlayerState.WallJump);
-            wallJumpDirection = isFacingRight ? WallJumpDirection.Left : WallJumpDirection.Right;
-        }
+            CheckColl(coll);
     }
 
     /// <summary>
@@ -416,6 +410,8 @@ public class Player : AnimationSprite
     /// <param name="coll">Possible sideways collision with a wall(or null)</param>
     private void CheckForWallSliding(Collision coll)
     {
+        if (currentState == PlayerState.Dash) return;
+
         if (coll != null && !IsGrounded(wallSlideSpeed))
         {
             if (CheckColl(coll)) return;
@@ -435,6 +431,12 @@ public class Player : AnimationSprite
     private bool IsGrounded(float vy)
     {
         return GetFutureCollisions(0, vy).FirstOrDefault(obj => obj.y > this.y) != null;
+    }
+
+    private bool IsWalled()
+    {
+        float direction = _mirrorX ? -moveSpeed : moveSpeed;
+        return GetFutureCollisions(direction * 2, 0).FirstOrDefault(obj => _mirrorX ? obj.x < this.x : obj.x > this.x) != null;
     }
 
     /// <summary>
@@ -487,7 +489,8 @@ public class Player : AnimationSprite
         var collX = MoveUntilCollision(amountToDash.x, 0);
         var collY = MoveUntilCollision(0, amountToDash.y);
 
-        if (collX != null && CheckColl(collX)) return;
+        if (collX != null && CheckColl(collX))
+            return;
         //Stops the dash if an interference with a collider occurres
         if (collY != null)
         {
@@ -522,6 +525,10 @@ public class Player : AnimationSprite
         else
         {
             SetCurrentState(PlayerState.Fall, fallSpeed * 0.2f);
+            if (Input.GetKey(Key.A))
+                Mirror(true, false);
+            else if (Input.GetKey(Key.D))
+                Mirror(false, false);
         }
     }
 
