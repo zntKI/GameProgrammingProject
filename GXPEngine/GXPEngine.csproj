@@ -85,6 +85,7 @@
     <Compile Include="GXPEngine\SoLoud\SoloudSoundSystem.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Spikes.cs" />
+    <Compile Include="Trampoline.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

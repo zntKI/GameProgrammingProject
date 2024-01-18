@@ -6,7 +6,7 @@ using TiledMapParser;
 
 public class Player : AnimationSprite
 {
-    private enum PlayerState { None, Fall, Jump, WallSlide, WallJump, Dash }
+    private enum PlayerState { None, Fall, Jump, WallSlide, WallJump, Dash, Bounce }
     PlayerState currentState;
 
     LevelList levelList;
@@ -59,6 +59,18 @@ public class Player : AnimationSprite
     private enum WallJumpDirection { Left = -1, Right = 1 }
     private WallJumpDirection wallJumpDirection;
 
+    //Bounce variables
+    private float bounceHeight;
+    private float bounceHeightFirstSection;
+    private float bounceHeightSecondSection;
+
+    private float bounceTimeMS;
+    private float bounceTimeSectionMS;
+    private float bounceTimeCounterMS;
+
+    private float bounceAmountFirstSection;
+    private float bounceAmountSecondSection;
+
     public Player(string imageFile, int cols, int rows, TiledObject obj=null) : base(imageFile, cols, rows)
     {
         //TODO: fix the bounds of the collider so that its more fair
@@ -69,7 +81,7 @@ public class Player : AnimationSprite
 
     private void InitVariables()
     {
-        currentState = PlayerState.Fall;
+        SetCurrentState(PlayerState.Fall);
 
         levelList = game.FindObjectOfType<LevelList>();
 
@@ -126,6 +138,20 @@ public class Player : AnimationSprite
         wallJumpAmount = new Vector2(wallJumpDistance.x / frames, wallJumpDistance.y / frames);
 
         wallJumpDirection = WallJumpDirection.Left;
+
+        //Bounce variables
+        bounceHeight = game.height / 16 * 4f;
+        bounceHeightFirstSection = game.height / 16 * 3f;
+        bounceHeightSecondSection = bounceHeight - bounceHeightFirstSection;
+
+        bounceTimeMS = 900f;
+        bounceTimeSectionMS = bounceTimeMS / 4f;
+        bounceTimeCounterMS = 0f;
+
+        frames = 60 * (bounceTimeSectionMS / 1000f);
+
+        bounceAmountFirstSection = bounceHeightFirstSection / frames;
+        bounceAmountSecondSection = bounceHeightSecondSection / frames;
     }
 
     private void Update()
@@ -219,6 +245,9 @@ public class Player : AnimationSprite
             case PlayerState.Dash:
                 ApplyDash();
                 break;
+            case PlayerState.Bounce:
+                ApplyBounce();
+                break;
             default:
                 ApplyNoVerticalMovement();
                 break;
@@ -236,6 +265,14 @@ public class Player : AnimationSprite
         else if (this.y > game.height)
         {
             Die();
+        }
+        else if (this.x - width / 2 < 0)
+        {
+            this.x = 0 + width / 2;
+        }
+        else if (this.x + width / 2 > game.width)
+        {
+            this.x = game.width - width / 2;
         }
     }
 
@@ -272,6 +309,12 @@ public class Player : AnimationSprite
 
                 SetCycle(3);
                 break;
+            case PlayerState.Bounce:
+                canDash = true;
+                bounceTimeCounterMS = 0f;
+
+                SetCycle(3);
+                break;
             default:
                 break;
         }
@@ -292,11 +335,6 @@ public class Player : AnimationSprite
         {
             canDash = true;
         }
-
-        //if (Input.GetKeyDown(Key.SPACE))
-        //{
-        //    SetCurrentState(PlayerState.Jump);
-        //}
     }
 
     /// <summary>
@@ -410,7 +448,7 @@ public class Player : AnimationSprite
     /// <param name="coll">Possible sideways collision with a wall(or null)</param>
     private void CheckForWallSliding(Collision coll)
     {
-        if (currentState == PlayerState.Dash) return;
+        if (currentState == PlayerState.Dash || currentState == PlayerState.Bounce) return;
 
         if (coll != null && !IsGrounded(wallSlideSpeed))
         {
@@ -532,6 +570,46 @@ public class Player : AnimationSprite
         }
     }
 
+    private void ApplyBounce()
+    {
+        bounceTimeCounterMS += Time.deltaTime;
+        Bounce();
+    }
+
+    private void Bounce()
+    {
+        float amountToBounce;
+        if (bounceTimeCounterMS < bounceTimeSectionMS)
+        {
+            amountToBounce = -bounceAmountFirstSection;
+        }
+        else if (bounceTimeCounterMS < bounceTimeSectionMS * 2)
+        {
+            amountToBounce = -bounceAmountSecondSection;
+        }
+        else if (bounceTimeCounterMS < bounceTimeSectionMS * 3)
+        {
+            amountToBounce = bounceAmountSecondSection;
+        }
+        else if (bounceTimeCounterMS < bounceTimeMS)
+        {
+            amountToBounce = bounceAmountFirstSection;
+        }
+        else
+        {
+            SetCurrentState(PlayerState.Fall, fallSpeed);
+            return;
+        }
+
+        var collY = MoveUntilCollision(0, amountToBounce);
+
+        if (collY != null)
+        {
+            if (CheckColl(collY)) return;
+            SetCurrentState(PlayerState.Fall, fallSpeed);
+        }
+    }
+
     /// <summary>
     /// Checks the type of the object with which the collision occured
     /// </summary>
@@ -547,11 +625,18 @@ public class Player : AnimationSprite
             Die();
             return true;
         }
+        else if (coll.other is Trampoline)
+        {
+            SetCurrentState(PlayerState.Bounce);
+            ((Trampoline)coll.other).DoAnimation(bounceTimeSectionMS);
+            return true;
+        }
         return false;
     }
 
     private void Die()
     {
+        //Remove(); ???
         levelList.CurrentLevel.RemoveChild(this);
         Destroy();
         levelList.CurrentLevel.ReloadLevel();
