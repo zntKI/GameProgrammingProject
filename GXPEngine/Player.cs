@@ -168,7 +168,7 @@ public class Player : AnimationSprite
     {
         CheckInputForDirection();
 
-        if (Input.GetKeyDown(Key.SPACE))
+        if (Input.GetKeyDown(Key.SPACE) || Input.GetKeyDown(Key.C))
         {
             if (currentState == PlayerState.None)
             {
@@ -180,7 +180,7 @@ public class Player : AnimationSprite
             }
         }
 
-        if (Input.GetKeyDown(Key.LEFT_SHIFT) && canDash)
+        if ((Input.GetKeyDown(Key.LEFT_SHIFT) || Input.GetKeyDown(Key.X)) && canDash)
         {
             SetCurrentState(PlayerState.Dash);
         }
@@ -619,9 +619,6 @@ public class Player : AnimationSprite
     {
         if (coll.other is Spikes)
         {
-            //TODO: fix player respawning twice
-            //TODO: check what needs to be done to fix the game slowing down
-            //after a number of times the Player dies - what needs to be done in addition to just deleting it?
             Die();
             return true;
         }
@@ -636,8 +633,8 @@ public class Player : AnimationSprite
 
     private void Die()
     {
-        //Remove(); ???
-        levelList.CurrentLevel.RemoveChild(this);
+        if (parent == null) return;
+
         Destroy();
         levelList.CurrentLevel.ReloadLevel();
     }
