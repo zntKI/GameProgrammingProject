@@ -86,7 +86,8 @@ namespace GXPEngine
 				if (j >= collList.Count) continue; //fix for removal in loop				
 				GameObject other = collList[j];
 				if (other.collider == null || (other.collider.isTrigger && !includeTriggers) || (!other.collider.isTrigger && !includeSolid)
-					|| (other is Block && ((Block)other).IsMarkedAsDestroyed)) continue;
+					|| (other is Block && ((Block)other).IsMarkedAsDestroyed) || (other is Balloon && ((Balloon)other).IsMarkedAsDestroyed))
+					continue; 
 				if (gameObject != other) {
 					if (gameObject.HitTest(other)) {
 						list.Add(other);

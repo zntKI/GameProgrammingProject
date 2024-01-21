@@ -33,7 +33,7 @@ public class LevelList : GameObject
 {
     public Level CurrentLevel => currentLevel;
 
-    private int startingIndex = 4;
+    private int startingIndex = 6;
     private Level currentLevel;
 
     public void LoadLevel()

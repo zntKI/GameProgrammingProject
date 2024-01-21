@@ -139,7 +139,7 @@ public class Player : AnimationSprite
         //dashAmountSecondSection = new Vector2(dashDistanceSecondSection.x / frames, dashDistanceSecondSection.y / frames);
 
         //WallJump variables
-        wallJumpDistance = new Vector2(game.width / 16 * 2.5f, (game.height / 16 * 2.5f) * -1f);
+        wallJumpDistance = new Vector2(game.width / 16 * 3f, (game.height / 16 * 3f) * -1f);
 
         wallJumpTimeMS = 300f;
         wallJumpTimeMSCounter = 0f;
@@ -151,8 +151,8 @@ public class Player : AnimationSprite
         wallJumpDirection = WallJumpDirection.Left;
 
         //Bounce variables
-        bounceHeight = game.height / 16 * 4f;
-        bounceHeightFirstSection = game.height / 16 * 3f;
+        bounceHeight = game.height / 16 * 4.5f;
+        bounceHeightFirstSection = game.height / 16 * 3.5f;
         bounceHeightSecondSection = bounceHeight - bounceHeightFirstSection;
 
         bounceTimeMS = 900f;
@@ -626,7 +626,7 @@ public class Player : AnimationSprite
     /// Checks the type of the object with which the collision occured
     /// </summary>
     /// <param name="coll">The collision that occured</param>
-    /// <returns>true if level is reloaded, otherwise false</returns>
+    /// <returns>true if code should process it as normal collider, otherwise false</returns>
     private bool CheckColl(Collision coll)
     {
         if (coll.other is Spikes)
@@ -643,6 +643,12 @@ public class Player : AnimationSprite
         else if (coll.other is Block && coll.normal.y == -1 && !((Block)coll.other).ShouldDestruct)
         {
             ((Block)coll.other).Destruct();
+        }
+        else if (coll.other is Balloon)
+        {
+            canDash = true;
+            ((Balloon)coll.other).Destruct();
+            return true;
         }
         return false;
     }

@@ -29,7 +29,6 @@ public class Block : AnimationSprite
 	{
 		if (shouldDestruct)
         {
-            Console.WriteLine("IN1");
             frameSwitchTimer += Time.deltaTime;
 
             if (frameSwitchTimer < timeBetweenFramesMS)
@@ -57,7 +56,6 @@ public class Block : AnimationSprite
         }
         else if (isMarkedAsDestroyed)
         {
-            Console.WriteLine("IN2");
             timeToStayDestroyedTimerMS += Time.deltaTime;
 
             if (timeToStayDestroyedTimerMS > timeToStayDestroyedMS)

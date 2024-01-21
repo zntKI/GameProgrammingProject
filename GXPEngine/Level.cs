@@ -31,7 +31,12 @@ public class Level : GameObject
     }
 
     public void ReloadLevel()
-    { 
+    {
+        var children = GetChildren();
+        foreach (var child in children)
+        { 
+            child.Destroy();
+        }
         CreateLevel();
     }
 }
