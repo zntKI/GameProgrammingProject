@@ -5,6 +5,9 @@ using TiledMapParser;
 
 public class Trampoline : AnimationSprite
 {
+    private int startFrame = 18;
+    private int suppressedFrame = 19;
+
     private float suppressedDurationMS;
     private float suppressedTimeCounterMS;
 
@@ -29,7 +32,7 @@ public class Trampoline : AnimationSprite
         if (suppressedTimeCounterMS < suppressedDurationMS)
             suppressedTimeCounterMS += Time.deltaTime;
         else
-            SetCycle(18);
+            SetCycle(startFrame);
 
         Animate();
     }
@@ -38,6 +41,6 @@ public class Trampoline : AnimationSprite
     {
         this.suppressedDurationMS = suppressedDurationMS;
         suppressedTimeCounterMS = 0f;
-        SetCycle(19);
+        SetCycle(suppressedFrame);
     }
 }

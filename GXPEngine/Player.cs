@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Linq;
 using GXPEngine;
 using GXPEngine.Core;
@@ -77,6 +78,16 @@ public class Player : AnimationSprite
         this.SetOrigin(width / 2, height / 2);
 
         InitVariables();
+    }
+
+    protected override Collider createCollider()
+    {
+        Canvas hitbox = new Canvas(4, 4, false);
+        hitbox.y = 2;
+        hitbox.SetOrigin(2, 2);
+        hitbox.graphics.Clear(Color.Red);
+        AddChild(hitbox);
+        return new BoxCollider(hitbox);
     }
 
     private void InitVariables()
@@ -334,6 +345,7 @@ public class Player : AnimationSprite
         else
         {
             canDash = true;
+            CheckColl(MoveUntilCollision(0f, fallSpeed));
         }
     }
 
@@ -627,6 +639,10 @@ public class Player : AnimationSprite
             SetCurrentState(PlayerState.Bounce);
             ((Trampoline)coll.other).DoAnimation(bounceTimeSectionMS);
             return true;
+        }
+        else if (coll.other is Block && coll.normal.y == -1 && !((Block)coll.other).ShouldDestruct)
+        {
+            ((Block)coll.other).Destruct();
         }
         return false;
     }

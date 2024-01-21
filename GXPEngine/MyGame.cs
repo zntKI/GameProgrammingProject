@@ -33,7 +33,7 @@ public class LevelList : GameObject
 {
     public Level CurrentLevel => currentLevel;
 
-    private int startingIndex = 3;
+    private int startingIndex = 4;
     private Level currentLevel;
 
     public void LoadLevel()
@@ -43,7 +43,6 @@ public class LevelList : GameObject
 
         if (levelId != startingIndex)
         {
-            game.RemoveChild(currentLevel);
             currentLevel.Destroy();
         }
 
