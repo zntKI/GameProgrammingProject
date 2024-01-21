@@ -7,7 +7,7 @@ using TiledMapParser;
 
 public class Player : AnimationSprite
 {
-    private enum PlayerState { None, Fall, Jump, WallSlide, WallJump, Dash, Bounce }
+    private enum PlayerState { None, Fall, Jump, WallSlide, WallJump, Dash, Bounce, OnCloud }
     PlayerState currentState;
 
     LevelList levelList;
@@ -172,6 +172,8 @@ public class Player : AnimationSprite
 
         ApplyHorizontalMovement();
 
+        //Console.WriteLine($"X: {x}; Y: {y}");
+
         Animate();
     }
 
@@ -259,8 +261,11 @@ public class Player : AnimationSprite
             case PlayerState.Bounce:
                 ApplyBounce();
                 break;
-            default:
+            case PlayerState.None:
                 ApplyNoVerticalMovement();
+                break;
+            default:
+                Console.WriteLine("OnCloud!");
                 break;
         }
 
@@ -649,6 +654,11 @@ public class Player : AnimationSprite
             canDash = true;
             ((Balloon)coll.other).Destruct();
             return true;
+        }
+        else if (coll.other is Cloud)
+        {
+            //TODO: Implement adding player as a child of cloud
+            //SetCurrentState(PlayerState.OnCloud);
         }
         return false;
     }

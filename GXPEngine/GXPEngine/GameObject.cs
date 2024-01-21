@@ -484,6 +484,8 @@ namespace GXPEngine
 				Vector2 newNormal;
 				float newTOI = TimeOfImpact (other, vx, vy, out newNormal);
 				if (newTOI < minTOI) {
+					if (other is Cloud && (newNormal.y == 1 || newNormal.x == 1 || newNormal.x == -1))
+						continue;
 					col = new Collision (this, other, newNormal, newTOI);
 					minTOI = newTOI;
 				}

@@ -14,7 +14,7 @@ public class Spikes : AnimationSprite
         Canvas hitbox = new Canvas(4, 3, false);
         hitbox.y = 4;
         hitbox.SetOrigin(1.5f, 3);
-        //hitbox.graphics.Clear(Color.Red);
+        hitbox.graphics.Clear(Color.Red);
         AddChild(hitbox);
         return new BoxCollider(hitbox);
     }
