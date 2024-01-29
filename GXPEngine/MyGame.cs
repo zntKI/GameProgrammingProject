@@ -20,7 +20,10 @@ public class MyGame : Game
 
     void Update()
     {
-
+        if (Input.GetKeyDown(Key.ENTER))
+        {
+            Console.WriteLine(GetDiagnostics());
+        }
     }
 
     static void Main()
@@ -33,7 +36,7 @@ public class LevelList : GameObject
 {
     public Level CurrentLevel => currentLevel;
 
-    private int startingIndex = 7;
+    private int startingIndex = 3;
     private Level currentLevel;
 
     public void LoadLevel()

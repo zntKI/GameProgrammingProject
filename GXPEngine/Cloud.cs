@@ -12,7 +12,7 @@ public class Cloud : AnimationSprite
 
 	public Cloud(string imageFile, int cols, int rows, TiledObject obj = null) : base(imageFile, cols, rows)
     {
-        SetOrigin(0, 0);
+        //SetOrigin(width / 2, height / 2);
         isGoingRight = obj.GetBoolProperty("isGoingRight");
 	}
 
@@ -24,15 +24,15 @@ public class Cloud : AnimationSprite
                 x += 1;
                 if (x >= game.width + width / 2)
                 {
-                    x = 0 - width;
+                    x = 0 - width / 2;
                 }
             }
             else
             {
                 x -= 1;
-                if (x <= 0 - width)
+                if (x <= 0 - width / 2)
                 {
-                    x = game.width;
+                    x = game.width + width / 2;
                 }
             }
         }

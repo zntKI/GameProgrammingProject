@@ -7,6 +7,7 @@ public class Spikes : AnimationSprite
 {
 	public Spikes(string imageFile, int cols, int rows, TiledObject obj = null) : base(imageFile, cols, rows, addCollider:true)
 	{
+        //TODO: change the collider properties depending on the spikes' direction
     }
     
     protected override Collider createCollider()

@@ -15,6 +15,8 @@ public class Player : AnimationSprite
     //Vertical movement variables
     private float fallSpeed;
     private float currentFallSpeed;
+    private float fallSpeedIncrement;
+    private float currentFallSpeedIncrement;
     private float wallSlideSpeed;
 
     private float jumpHeight;
@@ -38,21 +40,19 @@ public class Player : AnimationSprite
     private Vector2 dashDirection;
     private Vector2 tempDashDirection;
 
-    //private Vector2 dashDistance;
-    private Vector2 dashDistanceFirstSection;
-    //private Vector2 dashDistanceSecondSection;
+    private Vector2 dashDistance;
 
     private float dashTimeMS;
-    private float dashTimeSectionMS;
+    private float dashAirTimeMS;
     private float dashTimeMSCounter;
 
-    private Vector2 dashAmountFirstSection;
-    //private Vector2 dashAmountSecondSection;
+    private Vector2 dashAmount;
 
     //Wall jump variables
     private Vector2 wallJumpDistance;
 
     private float wallJumpTimeMS;
+    private float wallJumpAirTimeMS;
     private float wallJumpTimeMSCounter;
 
     private Vector2 wallJumpAmount;
@@ -74,7 +74,6 @@ public class Player : AnimationSprite
 
     public Player(string imageFile, int cols, int rows, TiledObject obj=null) : base(imageFile, cols, rows)
     {
-        //TODO: fix the bounds of the collider so that its more fair
         this.SetOrigin(width / 2, height / 2);
 
         InitVariables();
@@ -112,6 +111,8 @@ public class Player : AnimationSprite
 
         fallSpeed = jumpAmountFirstSection * 1.2f;
         currentFallSpeed = fallSpeed;
+        fallSpeedIncrement = 0.08f;
+        currentFallSpeedIncrement = fallSpeedIncrement;
 
         wallSlideSpeed = fallSpeed * 0.5f;
 
@@ -125,23 +126,21 @@ public class Player : AnimationSprite
         dashDirection = new Vector2();
         tempDashDirection = new Vector2();
 
-        //dashDistance = new Vector2(game.width / 16 * 4f, game.height / 16 * 4f);
-        dashDistanceFirstSection = new Vector2(game.width / 16 * 3.5f, game.height / 16 * 3.5f);
-        //dashDistanceSecondSection = new Vector2(dashDistance.x - dashDistanceFirstSection.x, dashDistance.y - dashDistanceFirstSection.y);
+        dashDistance = new Vector2(game.width / 16 * 4f, game.height / 16 * 3.5f);
 
-        dashTimeMS = 450;
-        dashTimeSectionMS = dashTimeMS / 2f;
+        dashTimeMS = 225;
+        dashAirTimeMS = 120;
         dashTimeMSCounter = 0f;
 
-        frames = 60 * (dashTimeSectionMS / 1000f);
+        frames = 60 * (dashTimeMS / 1000f);
 
-        dashAmountFirstSection = new Vector2(dashDistanceFirstSection.x / frames, dashDistanceFirstSection.y / frames);
-        //dashAmountSecondSection = new Vector2(dashDistanceSecondSection.x / frames, dashDistanceSecondSection.y / frames);
+        dashAmount = new Vector2(dashDistance.x / frames, dashDistance.y / frames);
 
         //WallJump variables
-        wallJumpDistance = new Vector2(game.width / 16 * 3f, (game.height / 16 * 3f) * -1f);
+        wallJumpDistance = new Vector2(game.width / 16 * 3.2f, (game.height / 16 * 2.4f) * -1f);
 
         wallJumpTimeMS = 300f;
+        wallJumpAirTimeMS = 150f;
         wallJumpTimeMSCounter = 0f;
 
         frames = 60 * (wallJumpTimeMS / 1000f);
@@ -171,8 +170,6 @@ public class Player : AnimationSprite
         HandleCurrentState();
 
         ApplyHorizontalMovement();
-
-        //Console.WriteLine($"X: {x}; Y: {y}");
 
         Animate();
     }
@@ -265,7 +262,7 @@ public class Player : AnimationSprite
                 ApplyNoVerticalMovement();
                 break;
             default:
-                Console.WriteLine("OnCloud!");
+                //Console.WriteLine("OnCloud!");
                 break;
         }
 
@@ -274,25 +271,32 @@ public class Player : AnimationSprite
 
     private void CheckPosition()
     {
-        if (this.y < 0)
+        Vector2 globalPos = TransformPoint(0, 0);
+        if (globalPos.y < 0)
         {
             levelList.LoadLevel();
         }
-        else if (this.y > game.height)
+        else if (globalPos.y > game.height)
         {
             Die();
         }
-        else if (this.x - width / 2 < 0)
+        else if (globalPos.x - width / 2 < 0)
         {
-            this.x = 0 + width / 2;
+            globalPos.x = 0 + width / 2;
+
+            Vector2 newLocal = parent.InverseTransformPoint(globalPos.x, globalPos.y);
+            this.x = newLocal.x;
         }
         else if (this.x + width / 2 > game.width)
         {
-            this.x = game.width - width / 2;
+            globalPos.x = game.width - width / 2;
+
+            Vector2 newLocal = parent.InverseTransformPoint(globalPos.x, globalPos.y);
+            this.x = newLocal.x;
         }
     }
 
-    private void SetCurrentState(PlayerState state, float startingFallSpeed=-1f)
+    private void SetCurrentState(PlayerState state, float startingFallSpeed=-1f, float fallSpeedIncrement=-1)
     {
         currentState = state;
         switch (currentState)
@@ -300,6 +304,11 @@ public class Player : AnimationSprite
             case PlayerState.Fall:
                 if (startingFallSpeed != -1f)
                     currentFallSpeed = startingFallSpeed;
+
+                if (fallSpeedIncrement != -1)
+                    currentFallSpeedIncrement = fallSpeedIncrement;
+                else
+                    currentFallSpeedIncrement = this.fallSpeedIncrement;
 
                 SetCycle(3);
                 break;
@@ -345,7 +354,7 @@ public class Player : AnimationSprite
         //If falling off a platform
         if (!IsGrounded(fallSpeed))
         {
-            SetCurrentState(PlayerState.Fall, fallSpeed);
+            SetCurrentState(PlayerState.Fall, fallSpeed * 0.2f);
         }
         else
         {
@@ -360,9 +369,10 @@ public class Player : AnimationSprite
     /// </summary>
     private void ApplyVerticalMovement()
     {
+        //Lerp?
         if (currentFallSpeed < fallSpeed)
         {
-            currentFallSpeed += 0.5f;
+            currentFallSpeed += currentFallSpeedIncrement;
         }
         else
         {
@@ -465,7 +475,8 @@ public class Player : AnimationSprite
     /// <param name="coll">Possible sideways collision with a wall(or null)</param>
     private void CheckForWallSliding(Collision coll)
     {
-        if (currentState == PlayerState.Dash || currentState == PlayerState.Bounce) return;
+        if (currentState == PlayerState.Dash || currentState == PlayerState.Bounce)
+            return;
 
         if (coll != null && !IsGrounded(wallSlideSpeed))
         {
@@ -490,6 +501,7 @@ public class Player : AnimationSprite
 
     private bool IsWalled()
     {
+        //TODO: Fix wall jumping problem regarding the direction check
         float direction = _mirrorX ? -moveSpeed : moveSpeed;
         return GetFutureCollisions(direction * 2, 0).FirstOrDefault(obj => _mirrorX ? obj.x < this.x : obj.x > this.x) != null;
     }
@@ -525,16 +537,28 @@ public class Player : AnimationSprite
     /// </summary>
     private void Dash()
     {
+        //Set the x and y of the dash separately so that the y value can be tampered with by applying gravity
+
         //Code depending on the last registered facing direction before the dash
         Vector2 amountToDash;
-        if (dashTimeMSCounter < dashTimeSectionMS)
+        if (dashTimeMSCounter < dashTimeMS)
         {
-            amountToDash = new Vector2(dashAmountFirstSection.x, dashAmountFirstSection.y);
+            amountToDash = new Vector2(dashAmount.x, dashAmount.y);
             currentMoveSpeed = moveSpeed * 0.1f;
+        }
+        else if (dashTimeMSCounter < dashTimeMS + dashAirTimeMS)
+        {
+            amountToDash = new Vector2();
+            if (Input.GetKey(Key.A) || Input.GetKey(Key.D))
+            {
+                SetCurrentState(PlayerState.Fall, fallSpeed * 0.01f, currentFallSpeedIncrement * 0.8f);
+                currentMoveSpeed = moveSpeed;
+                return;
+            }
         }
         else
         {
-            SetCurrentState(PlayerState.Fall, fallSpeed * 0.2f);
+            SetCurrentState(PlayerState.Fall, fallSpeed * 0.1f, currentFallSpeedIncrement * 0.8f);
             currentMoveSpeed = moveSpeed;
             return;
         }
@@ -577,9 +601,16 @@ public class Player : AnimationSprite
                 SetCurrentState(PlayerState.Fall, fallSpeed * 0.2f);
             }
         }
+        else if (wallJumpTimeMSCounter < wallJumpTimeMS + wallJumpAirTimeMS)
+        {
+            if (Input.GetKey(Key.A) || Input.GetKey(Key.D))
+            {
+                wallJumpTimeMSCounter = wallJumpTimeMS + wallJumpAirTimeMS;
+            }
+        }
         else
         {
-            SetCurrentState(PlayerState.Fall, fallSpeed * 0.2f);
+            SetCurrentState(PlayerState.Fall, fallSpeed * 0.01f);
             if (Input.GetKey(Key.A))
                 Mirror(true, false);
             else if (Input.GetKey(Key.D))
@@ -645,20 +676,26 @@ public class Player : AnimationSprite
             ((Trampoline)coll.other).DoAnimation(bounceTimeSectionMS);
             return true;
         }
-        else if (coll.other is Block && coll.normal.y == -1 && !((Block)coll.other).ShouldDestruct)
+        else if (coll.other is Block && (coll.normal.y == -1 || coll.normal.x == -1 || coll.normal.x == 1)
+            && !((Block)coll.other).ShouldDestruct)
         {
             ((Block)coll.other).Destruct();
         }
-        else if (coll.other is Balloon)
+        else if (coll.other is Balloon && !canDash)
         {
+            //TODO: Make trigger
             canDash = true;
             ((Balloon)coll.other).Destruct();
             return true;
         }
         else if (coll.other is Cloud)
         {
-            //TODO: Implement adding player as a child of cloud
-            //SetCurrentState(PlayerState.OnCloud);
+            //Sets the Player a child of Cloud
+            coll.other.AddChild(this);
+            x = x - coll.other.x;
+            y = -height;
+            SetCurrentState(PlayerState.None);
+            return true;
         }
         return false;
     }
