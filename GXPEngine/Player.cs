@@ -76,6 +76,8 @@ public class Player : AnimationSprite
     {
         this.SetOrigin(width / 2, height / 2);
 
+        new Sound("Sounds/respawn.wav").Play(false, 0, 0.5f);
+
         InitVariables();
     }
 
@@ -317,6 +319,7 @@ public class Player : AnimationSprite
                 jumpTimeMSCounter = 0f;
 
                 SetCycle(3);
+                new Sound("Sounds/jump.wav").Play();
                 break;
             case PlayerState.WallSlide:
                 SetCycle(5);
@@ -338,6 +341,7 @@ public class Player : AnimationSprite
                 wallJumpTimeMSCounter = 0f;
 
                 SetCycle(3);
+                new Sound("Sounds/walljump.wav").Play();
                 break;
             case PlayerState.Dash:
                 canDash = false;
@@ -345,6 +349,7 @@ public class Player : AnimationSprite
                 dashDirection = tempDashDirection;
 
                 SetCycle(3);
+                new Sound("Sounds/dash.wav").Play(false, 0, 0.5f);
                 break;
             case PlayerState.Bounce:
                 canDash = true;
@@ -513,7 +518,6 @@ public class Player : AnimationSprite
 
     private (bool, int) IsWalled()
     {
-        //TODO: Fix wall jumping problem regarding the direction check
         var leftColl = GetFutureCollisions(-moveSpeed * 2, 0).FirstOrDefault(obj => obj.x < this.x);
         var rightColl = GetFutureCollisions(moveSpeed * 2, 0).FirstOrDefault(obj => obj.x > this.x);
 
@@ -697,18 +701,26 @@ public class Player : AnimationSprite
         {
             SetCurrentState(PlayerState.Bounce);
             ((Trampoline)coll.other).DoAnimation(bounceTimeSectionMS);
+
+            new Sound("Sounds/die1.wav").Play();
+
             return true;
         }
         else if (coll.other is Block && (coll.normal.y == -1 || coll.normal.x == -1 || coll.normal.x == 1)
             && !((Block)coll.other).ShouldDestruct)
         {
             ((Block)coll.other).Destruct();
+
+            new Sound("Sounds/crumbling.wav").Play();
         }
         else if (coll.other is Balloon && !canDash)
         {
             //TODO: Make trigger
             canDash = true;
             ((Balloon)coll.other).Destruct();
+
+            new Sound("Sounds/balloon_collect.wav").Play();
+
             return true;
         }
         else if (coll.other is Cloud)
@@ -726,6 +738,8 @@ public class Player : AnimationSprite
     private void Die()
     {
         if (parent == null) return;
+
+        new Sound("Sounds/die1.wav").Play(false, 0, 0.5f);
 
         Destroy();
         levelList.CurrentLevel.ReloadLevel();

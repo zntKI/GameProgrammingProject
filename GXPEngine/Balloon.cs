@@ -44,6 +44,8 @@ public class Balloon : AnimationSprite
             {
                 isMarkedAsDestroyed = false;
                 SetCycle(1, 3, animDelay);
+
+                new Sound("Sounds/block_respawn.wav").Play();
             }
         }
 

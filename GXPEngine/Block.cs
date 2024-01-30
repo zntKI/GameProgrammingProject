@@ -21,7 +21,6 @@ public class Block : AnimationSprite
 
     public Block(string imageFile, int cols, int rows, TiledObject obj = null) : base(imageFile, cols, rows)
     {
-        //TODO: Fix blocks not working after dying once
         SetCycle(startFrame);
     }
 
@@ -62,6 +61,8 @@ public class Block : AnimationSprite
             {
                 isMarkedAsDestroyed = false;
                 SetCycle(startFrame);
+
+                new Sound("Sounds/block_respawn.wav").Play();
             }
             else
             {

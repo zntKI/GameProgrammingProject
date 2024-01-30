@@ -14,7 +14,6 @@ public class Trampoline : AnimationSprite
 
     public Trampoline(string imageFile, int cols, int rows, TiledObject obj = null) : base(imageFile, cols, rows)
 	{
-        //TODO: fix the bounds of the collider
     }
 
     protected override Collider createCollider()

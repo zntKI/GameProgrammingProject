@@ -12,6 +12,8 @@ public class MyGame : Game
 
     public MyGame() : base(128, 128, false, false, 1024, 1024, true)
     {
+        new Sound("Sounds/main.wav", true, true).Play();
+
         levelList = new LevelList();
         AddChild(levelList);
 
