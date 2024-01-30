@@ -186,7 +186,8 @@ public class Player : AnimationSprite
             }
             else
             {
-                if (IsWalled()) SetCurrentState(PlayerState.WallJump);
+                var result = IsWalled();
+                if (result.Item1) SetCurrentState(PlayerState.WallJump, result.Item2);
             }
         }
 
@@ -296,17 +297,17 @@ public class Player : AnimationSprite
         }
     }
 
-    private void SetCurrentState(PlayerState state, float startingFallSpeed=-1f, float fallSpeedIncrement=-1)
+    private void SetCurrentState(PlayerState state, params float[] extraParams)
     {
         currentState = state;
         switch (currentState)
         {
             case PlayerState.Fall:
-                if (startingFallSpeed != -1f)
-                    currentFallSpeed = startingFallSpeed;
+                if (extraParams.Length > 0)
+                    currentFallSpeed = extraParams[0];
 
-                if (fallSpeedIncrement != -1)
-                    currentFallSpeedIncrement = fallSpeedIncrement;
+                if (extraParams.Length > 1)
+                    currentFallSpeedIncrement = extraParams[1];
                 else
                     currentFallSpeedIncrement = this.fallSpeedIncrement;
 
@@ -321,10 +322,21 @@ public class Player : AnimationSprite
                 SetCycle(5);
                 break;
             case PlayerState.WallJump:
-                wallJumpDirection = _mirrorX ? WallJumpDirection.Right : WallJumpDirection.Left;
+                if (extraParams.Length == 0)
+                    throw new ArgumentException("Cannot set the state to wall jumping without extra param", nameof(extraParams));
+
+                if (extraParams[0] == 1)
+                {
+                    wallJumpDirection = _mirrorX ? WallJumpDirection.Right : WallJumpDirection.Left;
+                    Mirror(!_mirrorX, false);
+                }
+                else
+                {
+                    wallJumpDirection = _mirrorX ? WallJumpDirection.Left : WallJumpDirection.Right;
+                }
+
                 wallJumpTimeMSCounter = 0f;
 
-                Mirror(!_mirrorX, false);
                 SetCycle(3);
                 break;
             case PlayerState.Dash:
@@ -499,11 +511,22 @@ public class Player : AnimationSprite
         return GetFutureCollisions(0, vy).FirstOrDefault(obj => obj.y > this.y) != null;
     }
 
-    private bool IsWalled()
+    private (bool, int) IsWalled()
     {
         //TODO: Fix wall jumping problem regarding the direction check
-        float direction = _mirrorX ? -moveSpeed : moveSpeed;
-        return GetFutureCollisions(direction * 2, 0).FirstOrDefault(obj => _mirrorX ? obj.x < this.x : obj.x > this.x) != null;
+        var leftColl = GetFutureCollisions(-moveSpeed * 2, 0).FirstOrDefault(obj => obj.x < this.x);
+        var rightColl = GetFutureCollisions(moveSpeed * 2, 0).FirstOrDefault(obj => obj.x > this.x);
+
+        if (leftColl != null)
+        {
+            return _mirrorX ? (true, 1) : (true, 0);
+        }
+        else if (rightColl != null)
+        {
+            return _mirrorX ? (true, 0) : (true, 1);
+        }
+
+        return (false, 0);
     }
 
     /// <summary>
