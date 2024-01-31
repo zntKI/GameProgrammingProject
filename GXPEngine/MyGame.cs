@@ -12,12 +12,12 @@ public class MyGame : Game
     {
         new Sound("Sounds/main.wav", true, true).Play();
 
-        AddChild(new Level("level8.tmx", 8));
+        AddChild(new MenuLevel("level0.tmx", 0));
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(Key.ENTER))
+        if (Input.GetKeyDown(Key.TAB))
         {
             Console.WriteLine(GetDiagnostics());
         }
