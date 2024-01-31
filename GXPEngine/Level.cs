@@ -10,6 +10,10 @@ public class Level : GameObject
 
     private Player player;
 
+    private HUD hud;
+    private int durationToShowHUD = 1000;
+    private int durationCounter = 0;
+
 	public Level(string fileName, int id)
 	{
         tiledLoader = new TiledLoader(fileName);
@@ -21,6 +25,19 @@ public class Level : GameObject
     private void Update()
     {
         CheckPlayerPosition();
+
+        if (durationCounter < durationToShowHUD)
+        {
+            hud.ShowTime();
+            hud.ShowScore(id);
+
+            durationCounter += Time.deltaTime;
+        }
+        else
+        {
+            hud.ClearTime();
+            hud.ClearScore();
+        }
     }
 
     private void CheckPlayerPosition()
@@ -48,6 +65,11 @@ public class Level : GameObject
         tiledLoader.LoadObjectGroups(0);
 
         player = FindObjectOfType<Player>();
+
+        hud = new HUD();
+        AddChild(hud);
+
+        durationCounter = 0;
     }
 
     public void ReloadLevel()
