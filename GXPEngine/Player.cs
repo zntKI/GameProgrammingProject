@@ -10,7 +10,8 @@ public class Player : AnimationSprite
     private enum PlayerState { None, Fall, Jump, WallSlide, WallJump, Dash, Bounce, OnCloud }
     PlayerState currentState;
 
-    LevelList levelList;
+    public bool ShouldDie => shouldDie;
+    private bool shouldDie;
 
     //Vertical movement variables
     private float fallSpeed;
@@ -95,7 +96,7 @@ public class Player : AnimationSprite
     {
         SetCurrentState(PlayerState.Fall);
 
-        levelList = game.FindObjectOfType<LevelList>();
+        shouldDie = false;
 
         //Vertical movement variables
         jumpHeight = game.height / 16 * 2.5f;
@@ -275,15 +276,7 @@ public class Player : AnimationSprite
     private void CheckPosition()
     {
         Vector2 globalPos = TransformPoint(0, 0);
-        if (globalPos.y < 0)
-        {
-            levelList.LoadLevel();
-        }
-        else if (globalPos.y > game.height)
-        {
-            Die();
-        }
-        else if (globalPos.x - width / 2 < 0)
+        if (globalPos.x - width / 2 < 0)
         {
             globalPos.x = 0 + width / 2;
 
@@ -694,7 +687,7 @@ public class Player : AnimationSprite
     {
         if (coll.other is Spikes)
         {
-            Die();
+            shouldDie = true;
             return true;
         }
         else if (coll.other is Trampoline)
@@ -735,13 +728,13 @@ public class Player : AnimationSprite
         return false;
     }
 
-    private void Die()
-    {
-        if (parent == null) return;
+    //private void Die()
+    //{
+    //    if (parent == null) return;
 
-        new Sound("Sounds/die1.wav").Play(false, 0, 0.5f);
+    //    new Sound("Sounds/die1.wav").Play(false, 0, 0.5f);
 
-        Destroy();
-        levelList.CurrentLevel.ReloadLevel();
-    }
+    //    Destroy();
+    //    levelList.CurrentLevel.ReloadLevel();
+    //}
 }

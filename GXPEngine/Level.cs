@@ -5,10 +5,10 @@ using TiledMapParser;
 
 public class Level : GameObject
 {
-    public int Id => id;
-
     private int id;
-	TiledLoader tiledLoader;
+	private TiledLoader tiledLoader;
+
+    private Player player;
 
 	public Level(string fileName, int id)
 	{
@@ -17,6 +17,24 @@ public class Level : GameObject
 
 		CreateLevel();
 	}
+
+    private void Update()
+    {
+        CheckPlayerPosition();
+    }
+
+    private void CheckPlayerPosition()
+    {
+        Vector2 globalPos = TransformPoint(player.x, player.y);
+        if (globalPos.y < 0)
+        {
+            LoadLevel();
+        }
+        else if (globalPos.y > game.height || player.ShouldDie)
+        {
+            PlayerDie();
+        }
+    }
 
     private void CreateLevel()
     {
@@ -28,6 +46,8 @@ public class Level : GameObject
         tiledLoader.autoInstance = true;
         tiledLoader.LoadTileLayers(0);
         tiledLoader.LoadObjectGroups(0);
+
+        player = FindObjectOfType<Player>();
     }
 
     public void ReloadLevel()
@@ -38,5 +58,20 @@ public class Level : GameObject
             child.Destroy();
         }
         CreateLevel();
+    }
+
+    private void PlayerDie()
+    {
+        new Sound("Sounds/die1.wav").Play(false, 0, 0.5f);
+        ReloadLevel();
+    }
+
+    private void LoadLevel()
+    {
+        Level level = new Level($"level{id + 1}.tmx", id + 1);
+
+        Destroy();
+
+        game.AddChild(level);
     }
 }
