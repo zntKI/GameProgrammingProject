@@ -10,6 +10,9 @@ public class Player : AnimationSprite
     private enum PlayerState { None, Fall, Jump, WallSlide, WallJump, Dash, Bounce, OnCloud }
     PlayerState currentState;
 
+    private int durationToNotMove;
+    private int durationToNotMoveCounter;
+
     public bool ShouldDie => shouldDie;
     private bool shouldDie;
 
@@ -96,6 +99,9 @@ public class Player : AnimationSprite
     {
         SetCurrentState(PlayerState.Fall);
 
+        durationToNotMove = 200;
+        durationToNotMoveCounter = 0;
+
         shouldDie = false;
 
         //Vertical movement variables
@@ -169,6 +175,12 @@ public class Player : AnimationSprite
 
     private void Update()
     {
+        if (durationToNotMoveCounter < durationToNotMove)
+        {
+            durationToNotMoveCounter += Time.deltaTime;
+            return;
+        }
+
         CheckForInput();
         HandleCurrentState();
 

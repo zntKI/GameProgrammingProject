@@ -12,7 +12,7 @@ public class Level : GameObject
 
     private HUD hud;
     private int durationToShowHUD = 1000;
-    private int durationCounter = 0;
+    private int durationToShowHUDCounter = 0;
 
 	public Level(string fileName, int id)
 	{
@@ -26,12 +26,12 @@ public class Level : GameObject
     {
         CheckPlayerPosition();
 
-        if (durationCounter < durationToShowHUD)
+        if (durationToShowHUDCounter < durationToShowHUD)
         {
             hud.ShowTime();
             hud.ShowScore(id);
 
-            durationCounter += Time.deltaTime;
+            durationToShowHUDCounter += Time.deltaTime;
         }
         else
         {
@@ -69,7 +69,7 @@ public class Level : GameObject
         hud = new HUD();
         AddChild(hud);
 
-        durationCounter = 0;
+        durationToShowHUDCounter = 0;
     }
 
     public void ReloadLevel()
