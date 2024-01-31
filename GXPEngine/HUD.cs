@@ -36,9 +36,9 @@ public class HUD : GameObject
         AddChild(score);
     }
 
-    public void ShowTime()
+    public void ShowTime(int timeGameStartMS)
     {
-        int timeMS = Time.time;
+        int timeMS = Time.time - timeGameStartMS;
 
         int seconds = (timeMS / 1000) % 60;
         int minutes = (timeMS / (1000 * 60)) % 60;

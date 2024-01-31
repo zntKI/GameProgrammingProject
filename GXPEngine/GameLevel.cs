@@ -11,11 +11,17 @@ public class GameLevel : Level
     private Player player;
 
     private HUD hud;
-    private int durationToShowHUD = 1000;
-    private int durationToShowHUDCounter = 0;
+    private int durationToShowHUD;
+    private int durationToShowHUDCounter;
 
-    public GameLevel(string fileName, int id) : base(fileName, id)
+    private int timeGameStartMS;
+
+    public GameLevel(string fileName, int id, int timeGameStartMS) : base(fileName, id)
     {
+        durationToShowHUD = 1000;
+        durationToShowHUDCounter = 0;
+
+        this.timeGameStartMS = timeGameStartMS;
     }
 
     private void Update()
@@ -24,7 +30,7 @@ public class GameLevel : Level
 
         if (durationToShowHUDCounter < durationToShowHUD)
         {
-            hud.ShowTime();
+            hud.ShowTime(timeGameStartMS);
             hud.ShowScore(id);
 
             durationToShowHUDCounter += Time.deltaTime;
@@ -62,15 +68,16 @@ public class GameLevel : Level
 
         player = FindObjectOfType<Player>();
 
-        hud = new HUD();
-        AddChild(hud);
+        if (hud == null)
+            hud = new HUD();
 
+        AddChild(hud);
         durationToShowHUDCounter = 0;
     }
 
     public void ReloadLevel()
     {
-        var children = GetChildren();
+        var children = GetChildren().Where(obj => !(obj is HUD));
         foreach (var child in children)
         {
             child.Destroy();
@@ -86,7 +93,7 @@ public class GameLevel : Level
 
     protected override void LoadLevel()
     {
-        GameLevel level = new GameLevel($"level{id + 1}.tmx", id + 1);
+        GameLevel level = new GameLevel($"level{id + 1}.tmx", id + 1, timeGameStartMS);
 
         Destroy();
 

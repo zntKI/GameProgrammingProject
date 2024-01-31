@@ -69,9 +69,9 @@ public class MenuLevel : Level
     {
         GameLevel level;
         if (id == 0)
-            level = new GameLevel($"level{1}.tmx", 1);
+            level = new GameLevel($"level{1}.tmx", 1, Time.time);
         else
-            level = new GameLevel($"level{0}.tmx", 0);
+            level = new GameLevel($"level{0}.tmx", 0, Time.time);
 
         Destroy();
         game.AddChild(level);
