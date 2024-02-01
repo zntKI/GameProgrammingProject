@@ -94,6 +94,9 @@ namespace GXPEngine
 			return game.GetGameObjectCollisions(this, includeTriggers, includeSolid);
 		}
 
+		/// <summary>
+		/// Checks for future collisions
+		/// </summary>
 		public GameObject[] GetFutureCollisions(float vx, float vy, bool includeTriggers = false, bool includeSolid = true)
 		{
             x += vx;
@@ -103,11 +106,6 @@ namespace GXPEngine
             y -= vy;
 			return overlaps;
         }
-
-		//public GameObject[] GetSurroundingCollisions(bool includeTriggers = true, bool includeSolid = true)
-		//{
-		//	return game.GetGameObjectSurroundingCollisions(this, includeTriggers, includeSolid);
-		//}
 
 		//------------------------------------------------------------------------------------------------------------------------
 		//														Render
@@ -484,8 +482,6 @@ namespace GXPEngine
 				Vector2 newNormal;
 				float newTOI = TimeOfImpact (other, vx, vy, out newNormal);
 				if (newTOI < minTOI) {
-					if (other is Cloud && (newNormal.y == 1 || newNormal.x == 1 || newNormal.x == -1))
-						continue;
 					col = new Collision (this, other, newNormal, newTOI);
 					minTOI = newTOI;
 				}

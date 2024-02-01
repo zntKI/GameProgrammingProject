@@ -5,15 +5,16 @@ using TiledMapParser;
 
 public class Trampoline : AnimationSprite
 {
-    private int startFrame = 18;
-    private int suppressedFrame = 19;
+    private int startFrame;
+    private int suppressedFrame;
 
     private float suppressedDurationMS;
     private float suppressedTimeCounterMS;
 
-
     public Trampoline(string imageFile, int cols, int rows, TiledObject obj = null) : base(imageFile, cols, rows)
 	{
+        startFrame = 18;
+        suppressedFrame = 19;
     }
 
     protected override Collider createCollider()
@@ -36,6 +37,10 @@ public class Trampoline : AnimationSprite
         Animate();
     }
 
+    /// <summary>
+    /// Sets the current frame to be the suppressed one
+    /// </summary>
+    /// <param name="suppressedDurationMS">How long should it be surppressed</param>
     public void DoAnimation(float suppressedDurationMS)
     {
         this.suppressedDurationMS = suppressedDurationMS;

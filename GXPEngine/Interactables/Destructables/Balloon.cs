@@ -9,20 +9,16 @@ using System.Text;
 using System.Threading.Tasks;
 using TiledMapParser;
 
-public class Balloon : AnimationSprite
+public class Balloon : Destructable
 {
-    public bool IsMarkedAsDestroyed => isMarkedAsDestroyed;
-
-    private bool isMarkedAsDestroyed = false;
-    private int timeToStayDestroyedMS = 2000;
-    private int timeToStayDestroyedTimerMS = 0;
-
-    private byte animDelay = 30;
+    private byte animDelay;
 
     public Balloon(string imageFile, int cols, int rows, TiledObject obj = null) : base(imageFile, cols, rows)
     {
         collider.isTrigger = true;
-		SetCycle(1, 3, animDelay);
+
+        animDelay = 30;
+        SetCycle(1, 3, animDelay);
     }
 
     protected override Collider createCollider()
@@ -39,15 +35,7 @@ public class Balloon : AnimationSprite
 	{
         if (isMarkedAsDestroyed)
         {
-            timeToStayDestroyedTimerMS += Time.deltaTime;
-
-            if (timeToStayDestroyedTimerMS > timeToStayDestroyedMS)
-            {
-                isMarkedAsDestroyed = false;
-                SetCycle(1, 3, animDelay);
-
-                new Sound("Sounds/block_respawn.wav").Play();
-            }
+            StayDestroyed();
         }
 
         MoveVertically();
@@ -60,7 +48,20 @@ public class Balloon : AnimationSprite
             y += Mathf.Sin(Time.time);
 	}
 
-    public void Destruct()
+    protected override void StayDestroyed()
+    {
+        timeToStayDestroyedTimerMS += Time.deltaTime;
+
+        if (timeToStayDestroyedTimerMS > timeToStayDestroyedMS)
+        {
+            isMarkedAsDestroyed = false;
+            SetCycle(1, 3, animDelay);
+
+            new Sound("Sounds/block_respawn.wav").Play();
+        }
+    }
+
+    public override void Destruct()
     {
         isMarkedAsDestroyed = true;
         timeToStayDestroyedTimerMS = 0;

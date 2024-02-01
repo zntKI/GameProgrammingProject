@@ -6,6 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/// <summary>
+/// Class that represents all the GameLevels in the game
+/// </summary>
 public class GameLevel : Level
 {
     private Player player;
@@ -14,7 +17,9 @@ public class GameLevel : Level
     private int durationToShowHUD;
     private int durationToShowHUDCounter;
 
+    //The time the actual game started
     private int timeGameStartMS;
+
     private int deathCount;
 
     public GameLevel(string fileName, int id, int timeGameStartMS, int deathCount) : base(fileName, id)
@@ -38,17 +43,19 @@ public class GameLevel : Level
 
     private void CheckPlayerPosition()
     {
-        Vector2 globalPos = TransformPoint(player.x, player.y);
-        if (globalPos.y < 0)
+        if (player.y < 0)
         {
             LoadLevel();
         }
-        else if (globalPos.y > game.height || player.ShouldDie)
+        else if (player.y > game.height || player.ShouldDie)
         {
             PlayerDie();
         }
     }
 
+    /// <summary>
+    /// Checks whether to show the HUD elements or to hide them
+    /// </summary>
     private void CheckStateForHUD()
     {
         if (durationToShowHUDCounter < durationToShowHUD)
@@ -65,6 +72,10 @@ public class GameLevel : Level
         }
     }
 
+    /// <summary>
+    /// Checks whether the Player currently collides with a trigger of type Flag.
+    /// If it does, it shows the HUD, if not - it hides it.
+    /// </summary>
     private void CheckTriggersForHUD()
     {
         if (player.CurrentTriggerCollisions.FirstOrDefault(obj => obj is Flag) != null)
@@ -81,6 +92,7 @@ public class GameLevel : Level
     {
         tiledLoader.rootObject = this;
         tiledLoader.addColliders = false;
+        tiledLoader.LoadImageLayers();
         tiledLoader.LoadTileLayers(1);
         tiledLoader.LoadObjectGroups(1);
         tiledLoader.addColliders = true;
@@ -92,6 +104,7 @@ public class GameLevel : Level
 
         if (hud == null)
         {
+            //Checks whether to create a special HUD, used only for the last GameLevel
             switch (id)
             {
                 case 21:
@@ -125,6 +138,9 @@ public class GameLevel : Level
         ReloadLevel();
     }
 
+    /// <summary>
+    /// Loads the next GameLevel
+    /// </summary>
     protected override void LoadLevel()
     {
         int increment = 1;

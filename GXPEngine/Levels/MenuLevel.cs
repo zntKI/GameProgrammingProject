@@ -7,8 +7,12 @@ using System.Text;
 using System.Threading.Tasks;
 using TiledMapParser;
 
+/// <summary>
+/// Class that represents the menu screens in the game
+/// </summary>
 public class MenuLevel : Level
 {
+    //Contains all the text that will be displayed for the given menu
     private readonly List<EasyDraw> easyDraws;
 
     Font font;
@@ -16,6 +20,8 @@ public class MenuLevel : Level
     public MenuLevel(string fileName, int id) : base(fileName, id)
     {
         font = Utils.LoadFont("pico-8-mono.ttf", 3);
+
+        //Determines the text data depending on the level id
         switch (id)
         {
             case 0:
@@ -32,6 +38,13 @@ public class MenuLevel : Level
         }
     }
 
+    /// <summary>
+    /// Modifies the EasyDraws by adjusting its properties
+    /// </summary>
+    /// <param name="i">EasyDraw's index in the 'easyDraws' list</param>
+    /// <param name="message">What the text will be</param>
+    /// <param name="x">X coordinate of EasyDraw</param>
+    /// <param name="y">Y coordinate of EasyDraw</param>
     private void InitEasyDraw(int i, string message, float x, float y)
     {
         if (i >= easyDraws.Capacity)
@@ -65,6 +78,9 @@ public class MenuLevel : Level
         tiledLoader.LoadTileLayers(0);
     }
 
+    /// <summary>
+    /// Loads the first GameLevel
+    /// </summary>
     protected override void LoadLevel()
     {
         GameLevel level = new GameLevel($"level{1}.tmx", 1, Time.time, 0);

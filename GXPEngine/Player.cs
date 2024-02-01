@@ -7,7 +7,7 @@ using TiledMapParser;
 
 public class Player : AnimationSprite
 {
-    private enum PlayerState { None, Fall, Jump, WallSlide, WallJump, Dash, Bounce, OnCloud }
+    private enum PlayerState { None, Fall, Jump, WallSlide, WallJump, Dash, Bounce }
     PlayerState currentState;
 
     private int durationToNotMove;
@@ -26,6 +26,11 @@ public class Player : AnimationSprite
     private float currentFallSpeedIncrement;
     private float wallSlideSpeed;
 
+    //Horizontal movement variables
+    private float moveSpeed;
+    private float currentMoveSpeed;
+
+    //Jump variables
     private float jumpHeight;
     private float jumpHeightFirstSection;
     private float jumpHeightSecondSection;
@@ -36,10 +41,6 @@ public class Player : AnimationSprite
 
     private float jumpAmountFirstSection;
     private float jumpAmountSecondSection;
-
-    //Horizontal movement variables
-    private float moveSpeed;
-    private float currentMoveSpeed;
 
     //Dash variables
     private bool canDash;
@@ -93,7 +94,7 @@ public class Player : AnimationSprite
         Canvas hitbox = new Canvas(4, 4, false);
         hitbox.y = 2;
         hitbox.SetOrigin(2, 2);
-        hitbox.graphics.Clear(Color.Red);
+        //hitbox.graphics.Clear(Color.Red);
         AddChild(hitbox);
         return new BoxCollider(hitbox);
     }
@@ -180,6 +181,7 @@ public class Player : AnimationSprite
 
     private void Update()
     {
+        //Disables movement for a short duration after respawning
         if (durationToNotMoveCounter < durationToNotMove)
         {
             durationToNotMoveCounter += Time.deltaTime;
@@ -218,35 +220,37 @@ public class Player : AnimationSprite
     }
 
     /// <summary>
-    /// Check for input regarding the direction variables for the sprite and dash and sets values to those accordingly
+    /// Check for input regarding the sprite direction and the direction variables for the dash
     /// </summary>
     private void CheckInputForDirection()
     {
-        if (Input.GetKeyDown(Key.A))
+        if (Input.GetKeyDown(Key.A) || Input.GetKeyDown(Key.LEFT))
         {
             Mirror(true, false);
 
             tempDashDirection.x = -1;
         }
-        else if (Input.GetKeyDown(Key.D))
+        else if (Input.GetKeyDown(Key.D) || Input.GetKeyDown(Key.RIGHT))
         {
             Mirror(false, false);
 
             tempDashDirection.x = 1;
         }
 
-        if (Input.GetKey(Key.W))
+        if (Input.GetKey(Key.W) || Input.GetKey(Key.UP))
         {
             tempDashDirection.y = -1;
-            if (!Input.GetKey(Key.A) && !Input.GetKey(Key.D))
+            if (!(Input.GetKey(Key.A) || Input.GetKey(Key.LEFT))
+                && !(Input.GetKey(Key.D) || Input.GetKey(Key.RIGHT)))
             {
                 tempDashDirection.x = 0;
             }
         }
-        else if (Input.GetKey(Key.S))
+        else if (Input.GetKey(Key.S) || Input.GetKey(Key.DOWN))
         {
             tempDashDirection.y = 1;
-            if (!Input.GetKey(Key.A) && !Input.GetKey(Key.D))
+            if (!(Input.GetKey(Key.A) || Input.GetKey(Key.LEFT))
+                && !(Input.GetKey(Key.D) || Input.GetKey(Key.RIGHT)))
             {
                 tempDashDirection.x = 0;
             }
@@ -292,24 +296,11 @@ public class Player : AnimationSprite
         CheckForTriggers();
     }
 
+    /// <summary>
+    /// Doesn't allow the player to go offscreen from the sides
+    /// </summary>
     private void CheckPosition()
     {
-        //Vector2 globalPos = TransformPoint(0, 0);
-        //if (globalPos.x - width / 2 < 0)
-        //{
-        //    globalPos.x = 0 + width / 2;
-
-        //    Vector2 newLocal = parent.InverseTransformPoint(globalPos.x, globalPos.y);
-        //    this.x = newLocal.x;
-        //}
-        //else if (this.x + width / 2 > game.width)
-        //{
-        //    globalPos.x = game.width - width / 2;
-
-        //    Vector2 newLocal = parent.InverseTransformPoint(globalPos.x, globalPos.y);
-        //    this.x = newLocal.x;
-        //}
-
         if (this.x - width / 2 < 0)
         {
             this.x = 0 + width / 2;
@@ -402,7 +393,7 @@ public class Player : AnimationSprite
     }
 
     /// <summary>
-    /// <para>Adding a specified amount to the player's Y coordinate, simulating the effect of gravity</para>
+    /// <para>Adding a specified amount to the player's Y coordinate, simulating gravity</para>
     /// Called when the current state is set to Fall
     /// </summary>
     private void ApplyVerticalMovement()
@@ -481,21 +472,21 @@ public class Player : AnimationSprite
         if (currentState == PlayerState.WallJump) return;
 
         Collision coll = null;
-        if (Input.GetKey(Key.A))
+        if (Input.GetKey(Key.A) || Input.GetKey(Key.LEFT))
         {
             coll = MoveUntilCollision(-currentMoveSpeed, 0);
             SetCycle(1, 4, 20);
         }
-        else if (Input.GetKey(Key.D))
+        else if (Input.GetKey(Key.D) || Input.GetKey(Key.RIGHT))
         {
             coll = MoveUntilCollision(currentMoveSpeed, 0);
             SetCycle(1, 4, 20);
         }
         else
         {
-            if (Input.GetKey(Key.W) && currentState != PlayerState.Dash)
+            if ((Input.GetKey(Key.W) || Input.GetKey(Key.UP)) && currentState != PlayerState.Dash)
                 SetCycle(7);
-            else if (Input.GetKey(Key.S) && currentState != PlayerState.Dash)
+            else if ((Input.GetKey(Key.S) || Input.GetKey(Key.DOWN)) && currentState != PlayerState.Dash)
                 SetCycle(6);
             else if (currentState == PlayerState.None)
                 SetCycle(1);
@@ -537,6 +528,11 @@ public class Player : AnimationSprite
         return GetFutureCollisions(0, vy).FirstOrDefault(obj => obj.y > this.y) != null;
     }
 
+    /// <summary>
+    /// Checks whether the Player collides with walls from both sides
+    /// </summary>
+    /// <returns>A tuple in which the first element represents whether there is a collision(true or false)
+    /// and the second - whether the player sprite should be flipped sideways(1 or 0)</returns>
     private (bool, int) IsWalled()
     {
         var leftColl = GetFutureCollisions(-moveSpeed * 2, 0).FirstOrDefault(obj => obj.x < this.x);
@@ -585,8 +581,6 @@ public class Player : AnimationSprite
     /// </summary>
     private void Dash()
     {
-        //Set the x and y of the dash separately so that the y value can be tampered with by applying gravity
-
         //Code depending on the last registered facing direction before the dash
         Vector2 amountToDash;
         if (dashTimeMSCounter < dashTimeMS)
@@ -594,10 +588,11 @@ public class Player : AnimationSprite
             amountToDash = new Vector2(dashAmount.x, dashAmount.y);
             currentMoveSpeed = moveSpeed * 0.1f;
         }
+        //Applies air time - not moving the player unless A or D key is pressed
         else if (dashTimeMSCounter < dashTimeMS + dashAirTimeMS)
         {
             amountToDash = new Vector2();
-            if (Input.GetKey(Key.A) || Input.GetKey(Key.D))
+            if ((Input.GetKey(Key.A) || Input.GetKey(Key.LEFT)) || (Input.GetKey(Key.D) || Input.GetKey(Key.RIGHT)))
             {
                 SetCurrentState(PlayerState.Fall, fallSpeed * 0.01f, currentFallSpeedIncrement * 0.8f);
                 currentMoveSpeed = moveSpeed;
@@ -627,12 +622,18 @@ public class Player : AnimationSprite
         }
     }
 
+    /// <summary>
+    /// Called when the current state is set to WallJump
+    /// </summary>
     private void ApplyWallJump()
     {
         wallJumpTimeMSCounter += Time.deltaTime;
         WallJump();
     }
 
+    /// <summary>
+    /// Moves the player with an amount depending on the walljump direction
+    /// </summary>
     private void WallJump()
     {
         if (wallJumpTimeMSCounter < wallJumpTimeMS)
@@ -649,9 +650,10 @@ public class Player : AnimationSprite
                 SetCurrentState(PlayerState.Fall, fallSpeed * 0.2f);
             }
         }
+        //Applies air time - not moving the player unless A or D key is pressed
         else if (wallJumpTimeMSCounter < wallJumpTimeMS + wallJumpAirTimeMS)
         {
-            if (Input.GetKey(Key.A) || Input.GetKey(Key.D))
+            if ((Input.GetKey(Key.A) || Input.GetKey(Key.LEFT)) || (Input.GetKey(Key.D) || Input.GetKey(Key.RIGHT)))
             {
                 wallJumpTimeMSCounter = wallJumpTimeMS + wallJumpAirTimeMS;
             }
@@ -659,19 +661,25 @@ public class Player : AnimationSprite
         else
         {
             SetCurrentState(PlayerState.Fall, fallSpeed * 0.01f);
-            if (Input.GetKey(Key.A))
+            if (Input.GetKey(Key.A) || Input.GetKey(Key.LEFT))
                 Mirror(true, false);
-            else if (Input.GetKey(Key.D))
+            else if (Input.GetKey(Key.D) || Input.GetKey(Key.RIGHT))
                 Mirror(false, false);
         }
     }
 
+    /// <summary>
+    /// Called when the current state is set to Bounce
+    /// </summary>
     private void ApplyBounce()
     {
         bounceTimeCounterMS += Time.deltaTime;
         Bounce();
     }
 
+    /// <summary>
+    /// Moves the player with an amount depending on the current time period of the bounce
+    /// </summary>
     private void Bounce()
     {
         float amountToBounce;
@@ -723,7 +731,7 @@ public class Player : AnimationSprite
             SetCurrentState(PlayerState.Bounce);
             ((Trampoline)coll.other).DoAnimation(bounceTimeSectionMS);
 
-            new Sound("Sounds/die1.wav").Play();
+            new Sound("Sounds/die1.wav").Play(false, 0, 0.5f);
 
             return true;
         }
@@ -732,20 +740,14 @@ public class Player : AnimationSprite
         {
             ((Block)coll.other).Destruct();
 
-            new Sound("Sounds/crumbling.wav").Play();
+            new Sound("Sounds/crumbling.wav").Play(false, 0, 0.5f);
         }
-        //else if (coll.other is Cloud)
-        //{
-        //    //Sets the Player a child of Cloud
-        //    coll.other.AddChild(this);
-        //    x = x - coll.other.x;
-        //    y = -height;
-        //    SetCurrentState(PlayerState.None);
-        //    return true;
-        //}
         return false;
     }
 
+    /// <summary>
+    /// Checks for current trigger collisions
+    /// </summary>
     private void CheckForTriggers()
     {
         currentTriggerCollisions = GetCollisions(true, false);

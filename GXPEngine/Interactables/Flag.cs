@@ -7,6 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using TiledMapParser;
 
+/// <summary>
+/// Class that represents the peak of the mountain
+/// </summary>
 public class Flag : AnimationSprite
 {
     private int startFrame;

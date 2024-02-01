@@ -98,19 +98,6 @@ namespace GXPEngine
             return list.ToArray();
 		}
 
-		//public GameObject[] GetCurrentSurroundingCollisions(GameObject gameObject, bool includeTriggers = true, bool includeSolid = true)
-		//{
-		//	Sprite obj = new Sprite(((Sprite)gameObject).texture);
-		//	obj.SetOrigin(obj.width / 2, obj.height / 2);
-		//	obj.SetXY(gameObject.x, gameObject.y);
-		//	obj.width *= 2;
-		//	obj.height *= 2;
-
-		//	List<GameObject> surrColliderList = colliderList.Where(c => c != obj && obj.HitTest(c)).ToList();
-
-		//	return GetCurrentCollisions(gameObject, includeTriggers, includeSolid, surrColliderList);
-		//}
-
 		//------------------------------------------------------------------------------------------------------------------------
 		//														Add()
 		//------------------------------------------------------------------------------------------------------------------------

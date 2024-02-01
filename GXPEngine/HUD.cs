@@ -14,6 +14,7 @@ public class HUD : GameObject
 
     Font font;
 
+    //Variables set only when the final GameLevel has been reached and the current HUD is being used by it
     int timeEndGameMS = -1;
     int timeStartGameMS = 1;
 
@@ -39,7 +40,7 @@ public class HUD : GameObject
         score.SetXY(game.width / 2, game.height / 2);
         AddChild(score);
 
-        endState = new EasyDraw(game.width / 2, 40, false);
+        endState = new EasyDraw(game.width / 2, 30, false);
         endState.TextFont(font);
         endState.TextAlign(CenterMode.Center, CenterMode.Center);
         endState.Fill(Color.White);
@@ -48,6 +49,7 @@ public class HUD : GameObject
         AddChild(endState);
     }
 
+    //Ctor for the final GameLevel
     public HUD(int timeEndGameMS, int timeStartGameMS) : this()
     {
         this.timeEndGameMS = timeEndGameMS;

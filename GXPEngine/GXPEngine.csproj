@@ -41,17 +41,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Balloon.cs" />
-    <Compile Include="Block.cs" />
-    <Compile Include="Cloud.cs" />
-    <Compile Include="Flag.cs" />
-    <Compile Include="GameLevel.cs" />
+    <Compile Include="Interactables\Destructables\Balloon.cs" />
+    <Compile Include="Interactables\Destructables\Block.cs" />
+    <Compile Include="Interactables\Destructables\Destructable.cs" />
+    <Compile Include="Interactables\Flag.cs" />
+    <Compile Include="Levels\GameLevel.cs" />
     <Compile Include="GXPEngine\AddOns\Gizmos.cs" />
     <Compile Include="GXPEngine\AddOns\SpriteBatch.cs" />
     <Compile Include="GXPEngine\AddOns\TiledLoader.cs" />
     <Compile Include="HUD.cs" />
-    <Compile Include="Level.cs" />
-    <Compile Include="MenuLevel.cs" />
+    <Compile Include="Levels\Level.cs" />
+    <Compile Include="Levels\MenuLevel.cs" />
     <Compile Include="MyGame.cs" />
     <Compile Include="GXPEngine\Core\Canvas.cs" />
     <Compile Include="GXPEngine\Game.cs" />
@@ -91,8 +91,8 @@
     <Compile Include="GXPEngine\SoLoud\Soloud.cs" />
     <Compile Include="GXPEngine\SoLoud\SoloudSoundSystem.cs" />
     <Compile Include="Player.cs" />
-    <Compile Include="Spikes.cs" />
-    <Compile Include="Trampoline.cs" />
+    <Compile Include="Interactables\Spikes.cs" />
+    <Compile Include="Interactables\Trampoline.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
