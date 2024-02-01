@@ -16,6 +16,9 @@ public class Player : AnimationSprite
     public bool ShouldDie => shouldDie;
     private bool shouldDie;
 
+    public GameObject[] CurrentTriggerCollisions => currentTriggerCollisions;
+    private GameObject[] currentTriggerCollisions;
+
     //Vertical movement variables
     private float fallSpeed;
     private float currentFallSpeed;
@@ -103,6 +106,8 @@ public class Player : AnimationSprite
         durationToNotMoveCounter = 0;
 
         shouldDie = false;
+
+        currentTriggerCollisions = new GameObject[0];
 
         //Vertical movement variables
         jumpHeight = game.height / 16 * 2.5f;
@@ -743,8 +748,8 @@ public class Player : AnimationSprite
 
     private void CheckForTriggers()
     {
-        var triggers = GetCollisions(true, false);
-        foreach (var trigger in triggers)
+        currentTriggerCollisions = GetCollisions(true, false);
+        foreach (var trigger in currentTriggerCollisions)
         {
             if (trigger is Balloon && !canDash)
             {

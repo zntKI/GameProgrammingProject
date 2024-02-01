@@ -15,19 +15,42 @@ public class GameLevel : Level
     private int durationToShowHUDCounter;
 
     private int timeGameStartMS;
+    private int deathCount;
 
-    public GameLevel(string fileName, int id, int timeGameStartMS) : base(fileName, id)
+    public GameLevel(string fileName, int id, int timeGameStartMS, int deathCount) : base(fileName, id)
     {
         durationToShowHUD = 1000;
         durationToShowHUDCounter = 0;
 
         this.timeGameStartMS = timeGameStartMS;
+        this.deathCount = deathCount;
     }
 
     private void Update()
     {
         CheckPlayerPosition();
 
+        CheckStateForHUD();
+
+        if (id == 21)
+            CheckTriggersForHUD();
+    }
+
+    private void CheckPlayerPosition()
+    {
+        Vector2 globalPos = TransformPoint(player.x, player.y);
+        if (globalPos.y < 0)
+        {
+            LoadLevel();
+        }
+        else if (globalPos.y > game.height || player.ShouldDie)
+        {
+            PlayerDie();
+        }
+    }
+
+    private void CheckStateForHUD()
+    {
         if (durationToShowHUDCounter < durationToShowHUD)
         {
             hud.ShowTime(timeGameStartMS);
@@ -42,16 +65,15 @@ public class GameLevel : Level
         }
     }
 
-    private void CheckPlayerPosition()
+    private void CheckTriggersForHUD()
     {
-        Vector2 globalPos = TransformPoint(player.x, player.y);
-        if (globalPos.y < 0)
+        if (player.CurrentTriggerCollisions.FirstOrDefault(obj => obj is Flag) != null)
         {
-            LoadLevel();
+            hud.ShowEndState(deathCount);
         }
-        else if (globalPos.y > game.height || player.ShouldDie)
+        else
         {
-            PlayerDie();
+            hud.ClearEndState();
         }
     }
 
@@ -69,7 +91,17 @@ public class GameLevel : Level
         player = FindObjectOfType<Player>();
 
         if (hud == null)
-            hud = new HUD();
+        {
+            switch (id)
+            {
+                case 21:
+                    hud = new HUD(Time.time, timeGameStartMS);
+                    break;
+                default:
+                    hud = new HUD();
+                    break;
+            }
+        }
 
         AddChild(hud);
         durationToShowHUDCounter = 0;
@@ -87,6 +119,8 @@ public class GameLevel : Level
 
     private void PlayerDie()
     {
+        deathCount++;
+
         new Sound("Sounds/die1.wav").Play(false, 0, 0.5f);
         ReloadLevel();
     }
@@ -106,7 +140,7 @@ public class GameLevel : Level
 
         Level level;
         if (id + 1 != 22)
-            level = new GameLevel($"level{id + increment}.tmx", id + increment, timeGameStartMS);
+            level = new GameLevel($"level{id + increment}.tmx", id + increment, timeGameStartMS, deathCount);
         else
             level = new MenuLevel($"level{id + increment}.tmx", id + increment);
 

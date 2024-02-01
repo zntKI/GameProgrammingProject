@@ -67,7 +67,7 @@ public class MenuLevel : Level
 
     protected override void LoadLevel()
     {
-        GameLevel level = new GameLevel($"level{1}.tmx", 1, Time.time);
+        GameLevel level = new GameLevel($"level{1}.tmx", 1, Time.time, 0);
 
         Destroy();
         game.AddChild(level);

@@ -10,8 +10,12 @@ public class HUD : GameObject
 {
     EasyDraw time;
     EasyDraw score;
+    EasyDraw endState;
 
     Font font;
+
+    int timeEndGameMS = -1;
+    int timeStartGameMS = 1;
 
     public HUD()
     {
@@ -34,23 +38,25 @@ public class HUD : GameObject
         score.SetOrigin(score.width / 2, score.height / 2);
         score.SetXY(game.width / 2, game.height / 2);
         AddChild(score);
+
+        endState = new EasyDraw(game.width / 2, 40, false);
+        endState.TextFont(font);
+        endState.TextAlign(CenterMode.Center, CenterMode.Center);
+        endState.Fill(Color.White);
+        endState.SetOrigin(endState.width / 2, endState.height / 2);
+        endState.SetXY(game.width / 2, 30);
+        AddChild(endState);
+    }
+
+    public HUD(int timeEndGameMS, int timeStartGameMS) : this()
+    {
+        this.timeEndGameMS = timeEndGameMS;
+        this.timeStartGameMS = timeStartGameMS;
     }
 
     public void ShowTime(int timeGameStartMS)
     {
-        int timeMS = Time.time - timeGameStartMS;
-
-        int seconds = (timeMS / 1000) % 60;
-        int minutes = (timeMS / (1000 * 60)) % 60;
-        int hours = (timeMS / (1000 * 60 * 60)) & 24;
-
-        StringBuilder sb = new StringBuilder();
-
-        sb.Append((hours < 10 ? $"0{hours}" : $"{hours}") + ":");
-        sb.Append((minutes < 10 ? $"0{minutes}" : $"{minutes}") + ":");
-        sb.Append(seconds < 10 ? $"0{seconds}" : $"{seconds}");
-
-        time.Text(sb.ToString(), true, 255, 0, 0, 0);
+        time.Text(CalculateTime(Time.time, timeGameStartMS), true, 255, 0, 0, 0);
     }
 
     public void ClearTime()
@@ -66,5 +72,42 @@ public class HUD : GameObject
     public void ClearScore()
     {
         score.ClearTransparent();
+    }
+
+    public void ShowEndState(int deathCount)
+    {
+        if (timeStartGameMS == -1 || timeEndGameMS == -1)
+        {
+            throw new InvalidOperationException("Not supposed to call this method if the current HUD is not a child of the final GameLevel");
+        }
+
+        endState.Text($"{CalculateTime(timeEndGameMS, timeStartGameMS)}\n\nDeaths:{deathCount}", true, 255, 0, 0, 0);
+    }
+
+    public void ClearEndState()
+    {
+        if (timeStartGameMS == -1 || timeEndGameMS == -1)
+        {
+            throw new InvalidOperationException("Not supposed to call this method if the current HUD is not a child of the final GameLevel");
+        }
+
+        endState.ClearTransparent();
+    }
+
+    private string CalculateTime(int currentTimeMS, int timeGameStartMS)
+    {
+        int timeMS = currentTimeMS - timeGameStartMS;
+
+        int seconds = (timeMS / 1000) % 60;
+        int minutes = (timeMS / (1000 * 60)) % 60;
+        int hours = (timeMS / (1000 * 60 * 60)) & 24;
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.Append((hours < 10 ? $"0{hours}" : $"{hours}") + ":");
+        sb.Append((minutes < 10 ? $"0{minutes}" : $"{minutes}") + ":");
+        sb.Append(seconds < 10 ? $"0{seconds}" : $"{seconds}");
+
+        return sb.ToString();
     }
 }
