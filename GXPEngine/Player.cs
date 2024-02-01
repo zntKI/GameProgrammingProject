@@ -76,7 +76,7 @@ public class Player : AnimationSprite
     private float bounceAmountFirstSection;
     private float bounceAmountSecondSection;
 
-    public Player(string imageFile, int cols, int rows, TiledObject obj=null) : base(imageFile, cols, rows)
+    public Player(string imageFile, int cols, int rows, TiledObject obj = null) : base(imageFile, cols, rows)
     {
         this.SetOrigin(width / 2, height / 2);
 
@@ -283,6 +283,8 @@ public class Player : AnimationSprite
         }
 
         CheckPosition();
+
+        CheckForTriggers();
     }
 
     private void CheckPosition()
@@ -630,7 +632,7 @@ public class Player : AnimationSprite
     {
         if (wallJumpTimeMSCounter < wallJumpTimeMS)
         {
-            Vector2 amountToWallJump = new Vector2(wallJumpAmount.x * (int)wallJumpDirection , wallJumpAmount.y);
+            Vector2 amountToWallJump = new Vector2(wallJumpAmount.x * (int)wallJumpDirection, wallJumpAmount.y);
 
             var collX = MoveUntilCollision(amountToWallJump.x, 0);
             var collY = MoveUntilCollision(0, amountToWallJump.y);
@@ -727,25 +729,30 @@ public class Player : AnimationSprite
 
             new Sound("Sounds/crumbling.wav").Play();
         }
-        else if (coll.other is Balloon && !canDash)
-        {
-            //TODO: Make trigger
-            canDash = true;
-            ((Balloon)coll.other).Destruct();
-
-            new Sound("Sounds/balloon_collect.wav").Play();
-
-            return true;
-        }
-        else if (coll.other is Cloud)
-        {
-            //Sets the Player a child of Cloud
-            coll.other.AddChild(this);
-            x = x - coll.other.x;
-            y = -height;
-            SetCurrentState(PlayerState.None);
-            return true;
-        }
+        //else if (coll.other is Cloud)
+        //{
+        //    //Sets the Player a child of Cloud
+        //    coll.other.AddChild(this);
+        //    x = x - coll.other.x;
+        //    y = -height;
+        //    SetCurrentState(PlayerState.None);
+        //    return true;
+        //}
         return false;
+    }
+
+    private void CheckForTriggers()
+    {
+        var triggers = GetCollisions(true, false);
+        foreach (var trigger in triggers)
+        {
+            if (trigger is Balloon && !canDash)
+            {
+                canDash = true;
+                ((Balloon)trigger).Destruct();
+
+                new Sound("Sounds/balloon_collect.wav").Play();
+            }
+        }
     }
 }

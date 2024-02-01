@@ -77,20 +77,20 @@ namespace GXPEngine
 		//------------------------------------------------------------------------------------------------------------------------
 		//												 GetCurrentCollisions()
 		//------------------------------------------------------------------------------------------------------------------------
-		public GameObject[] GetCurrentCollisions (GameObject gameObject, bool includeTriggers=true, bool includeSolid=true, List<GameObject> collList=null)
+		public GameObject[] GetCurrentCollisions (GameObject gameObject, bool includeTriggers=true, bool includeSolid= true/*, List<GameObject> collList=null*/)
 		{
-			if (collList == null) collList = colliderList;
+			//if (collList == null) collList = colliderList;
 
             List<GameObject> list = new List<GameObject>();
-			for (int j= collList.Count-1; j>=0; j--) {
-				if (j >= collList.Count) continue; //fix for removal in loop				
-				GameObject other = collList[j];
+			for (int j= colliderList.Count-1; j>=0; j--) {
+				if (j >= colliderList.Count) continue; //fix for removal in loop				
+				GameObject other = colliderList[j];
 				if (other.collider == null || (other.collider.isTrigger && !includeTriggers) || (!other.collider.isTrigger && !includeSolid)
 					|| (other is Block && ((Block)other).IsMarkedAsDestroyed) || (other is Balloon && ((Balloon)other).IsMarkedAsDestroyed))
 					continue; 
 				if (gameObject != other) {
 					if (gameObject.HitTest(other)) {
-						list.Add(other);
+                        list.Add(other);
 					}
 				}
 			}
@@ -98,18 +98,18 @@ namespace GXPEngine
             return list.ToArray();
 		}
 
-		public GameObject[] GetCurrentSurroundingCollisions(GameObject gameObject, bool includeTriggers = true, bool includeSolid = true)
-		{
-			Sprite obj = new Sprite(((Sprite)gameObject).texture);
-			obj.SetOrigin(obj.width / 2, obj.height / 2);
-			obj.SetXY(gameObject.x, gameObject.y);
-			obj.width *= 2;
-			obj.height *= 2;
+		//public GameObject[] GetCurrentSurroundingCollisions(GameObject gameObject, bool includeTriggers = true, bool includeSolid = true)
+		//{
+		//	Sprite obj = new Sprite(((Sprite)gameObject).texture);
+		//	obj.SetOrigin(obj.width / 2, obj.height / 2);
+		//	obj.SetXY(gameObject.x, gameObject.y);
+		//	obj.width *= 2;
+		//	obj.height *= 2;
 
-			List<GameObject> surrColliderList = colliderList.Where(c => c != obj && obj.HitTest(c)).ToList();
+		//	List<GameObject> surrColliderList = colliderList.Where(c => c != obj && obj.HitTest(c)).ToList();
 
-			return GetCurrentCollisions(gameObject, includeTriggers, includeSolid, surrColliderList);
-		}
+		//	return GetCurrentCollisions(gameObject, includeTriggers, includeSolid, surrColliderList);
+		//}
 
 		//------------------------------------------------------------------------------------------------------------------------
 		//														Add()

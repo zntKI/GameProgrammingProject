@@ -104,10 +104,10 @@ namespace GXPEngine
 			return overlaps;
         }
 
-		public GameObject[] GetSurroundingCollisions(bool includeTriggers = true, bool includeSolid = true)
-		{
-			return game.GetGameObjectSurroundingCollisions(this, includeTriggers, includeSolid);
-		}
+		//public GameObject[] GetSurroundingCollisions(bool includeTriggers = true, bool includeSolid = true)
+		//{
+		//	return game.GetGameObjectSurroundingCollisions(this, includeTriggers, includeSolid);
+		//}
 
 		//------------------------------------------------------------------------------------------------------------------------
 		//														Render
@@ -508,7 +508,7 @@ namespace GXPEngine
 		virtual public Collision MoveUntilCollision(float vx, float vy) {
 			x += vx;
 			y += vy;
-			GameObject[] overlaps = GetSurroundingCollisions (false,true);
+			GameObject[] overlaps = GetCollisions (false, true);
 			x -= vx;
 			y -= vy;
 			return MoveUntilCollision (vx, vy, overlaps);

@@ -21,6 +21,7 @@ public class Balloon : AnimationSprite
 
     public Balloon(string imageFile, int cols, int rows, TiledObject obj = null) : base(imageFile, cols, rows)
     {
+        collider.isTrigger = true;
 		SetCycle(1, 3, animDelay);
     }
 

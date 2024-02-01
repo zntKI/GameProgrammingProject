@@ -241,10 +241,10 @@ namespace GXPEngine
 			return _collisionManager.GetCurrentCollisions(gameObject, includeTriggers, includeSolid);
 		}
 
-		internal GameObject[] GetGameObjectSurroundingCollisions(GameObject gameObject, bool includeTriggers = true, bool includeSolid = true)
-		{
-			return _collisionManager.GetCurrentSurroundingCollisions(gameObject, includeTriggers, includeSolid);
-		}
+		//internal GameObject[] GetGameObjectSurroundingCollisions(GameObject gameObject, bool includeTriggers = true, bool includeSolid = true)
+		//{
+		//	return _collisionManager.GetCurrentSurroundingCollisions(gameObject, includeTriggers, includeSolid);
+		//}
 
 
 		//------------------------------------------------------------------------------------------------------------------------
