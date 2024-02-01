@@ -12,7 +12,7 @@ public class MyGame : Game
     {
         new Sound("Sounds/main.wav", true, true).Play();
 
-        AddChild(new MenuLevel("level0.tmx", 0));
+        AddChild(new GameLevel("level20.tmx", 20, Time.time));
     }
 
     void Update()

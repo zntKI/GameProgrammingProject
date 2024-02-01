@@ -24,10 +24,10 @@ public class MenuLevel : Level
                 InitEasyDraw(0, "Press 'ENTER' to start", game.width / 2, game.height / 2 + 20);
                 break;
             default:
-                easyDraws = new List<EasyDraw>() { new EasyDraw(14 * 8, 13, false), new EasyDraw(10 * 8, 13, false) };
+                easyDraws = new List<EasyDraw>() { new EasyDraw(14 * 8, 13, false), new EasyDraw(12 * 8, 13, false) };
 
                 InitEasyDraw(0, "Press 'ENTER' to restart", game.width / 2, game.height / 2 + 20);
-                InitEasyDraw(1, "Press 'ESC' to quit", game.width / 2 + easyDraws[1].height * 1.5f, game.height / 2 + 20);
+                InitEasyDraw(1, "Press 'DELETE' to quit", game.width / 2, game.height / 2 + 30);
                 break;
         }
     }
@@ -52,7 +52,7 @@ public class MenuLevel : Level
         {
             LoadLevel();
         }
-        else if (id != 0 && Input.GetKeyDown(Key.ESCAPE))
+        else if (id != 0 && Input.GetKeyDown(Key.DELETE2))
         {
             game.Destroy();
         }
@@ -67,11 +67,7 @@ public class MenuLevel : Level
 
     protected override void LoadLevel()
     {
-        GameLevel level;
-        if (id == 0)
-            level = new GameLevel($"level{1}.tmx", 1, Time.time);
-        else
-            level = new GameLevel($"level{0}.tmx", 0, Time.time);
+        GameLevel level = new GameLevel($"level{1}.tmx", 1, Time.time);
 
         Destroy();
         game.AddChild(level);

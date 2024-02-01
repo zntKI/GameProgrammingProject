@@ -93,7 +93,22 @@ public class GameLevel : Level
 
     protected override void LoadLevel()
     {
-        GameLevel level = new GameLevel($"level{id + 1}.tmx", id + 1, timeGameStartMS);
+        int increment = 1;
+        //7 11 17
+        if (id + 1 == 7 || id + 1 == 11)
+        {
+            increment = 2;
+        }
+        if (id + 1 == 16)
+        {
+            increment = 3;
+        }
+
+        Level level;
+        if (id + 1 != 22)
+            level = new GameLevel($"level{id + increment}.tmx", id + increment, timeGameStartMS);
+        else
+            level = new MenuLevel($"level{id + increment}.tmx", id + increment);
 
         Destroy();
 

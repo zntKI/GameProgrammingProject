@@ -133,7 +133,7 @@ public class Player : AnimationSprite
         canDash = true;
 
         dashDirection = new Vector2();
-        tempDashDirection = new Vector2();
+        tempDashDirection = new Vector2(1, 0);
 
         dashDistance = new Vector2(game.width / 16 * 4f, game.height / 16 * 3.5f);
 
@@ -287,20 +287,29 @@ public class Player : AnimationSprite
 
     private void CheckPosition()
     {
-        Vector2 globalPos = TransformPoint(0, 0);
-        if (globalPos.x - width / 2 < 0)
-        {
-            globalPos.x = 0 + width / 2;
+        //Vector2 globalPos = TransformPoint(0, 0);
+        //if (globalPos.x - width / 2 < 0)
+        //{
+        //    globalPos.x = 0 + width / 2;
 
-            Vector2 newLocal = parent.InverseTransformPoint(globalPos.x, globalPos.y);
-            this.x = newLocal.x;
+        //    Vector2 newLocal = parent.InverseTransformPoint(globalPos.x, globalPos.y);
+        //    this.x = newLocal.x;
+        //}
+        //else if (this.x + width / 2 > game.width)
+        //{
+        //    globalPos.x = game.width - width / 2;
+
+        //    Vector2 newLocal = parent.InverseTransformPoint(globalPos.x, globalPos.y);
+        //    this.x = newLocal.x;
+        //}
+
+        if (this.x - width / 2 < 0)
+        {
+            this.x = 0 + width / 2;
         }
         else if (this.x + width / 2 > game.width)
         {
-            globalPos.x = game.width - width / 2;
-
-            Vector2 newLocal = parent.InverseTransformPoint(globalPos.x, globalPos.y);
-            this.x = newLocal.x;
+            this.x = game.width - width / 2;
         }
     }
 
@@ -739,14 +748,4 @@ public class Player : AnimationSprite
         }
         return false;
     }
-
-    //private void Die()
-    //{
-    //    if (parent == null) return;
-
-    //    new Sound("Sounds/die1.wav").Play(false, 0, 0.5f);
-
-    //    Destroy();
-    //    levelList.CurrentLevel.ReloadLevel();
-    //}
 }
