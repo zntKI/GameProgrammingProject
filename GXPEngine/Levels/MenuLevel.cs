@@ -36,6 +36,8 @@ public class MenuLevel : Level
                 InitEasyDraw(1, "Press 'DELETE' to quit", game.width / 2, game.height / 2 + 30);
                 break;
         }
+
+        CreateLevel();
     }
 
     /// <summary>
@@ -83,7 +85,7 @@ public class MenuLevel : Level
     /// </summary>
     protected override void LoadLevel()
     {
-        GameLevel level = new GameLevel($"level{1}.tmx", 1, Time.time, 0);
+        GameLevel level = new GameLevel($"Levels/level{1}.tmx", 1, Time.time, 0, 0);
 
         Destroy();
         game.AddChild(level);

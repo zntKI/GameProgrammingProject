@@ -76,14 +76,14 @@ public class HUD : GameObject
         score.ClearTransparent();
     }
 
-    public void ShowEndState(int deathCount)
+    public void ShowEndState(int deathCount, int strawberriesCount)
     {
         if (timeStartGameMS == -1 || timeEndGameMS == -1)
         {
             throw new InvalidOperationException("Not supposed to call this method if the current HUD is not a child of the final GameLevel");
         }
-
-        endState.Text($"{CalculateTime(timeEndGameMS, timeStartGameMS)}\n\nDeaths:{deathCount}", true, 255, 0, 0, 0);
+;
+        endState.Text($"{CalculateTime(timeEndGameMS, timeStartGameMS)}\n\nDeaths:{deathCount}\n\nStrBer:{strawberriesCount}", true, 255, 0, 0, 0);
     }
 
     public void ClearEndState()

@@ -41,10 +41,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Interactables\Chest.cs" />
     <Compile Include="Interactables\Destructables\Balloon.cs" />
     <Compile Include="Interactables\Destructables\Block.cs" />
     <Compile Include="Interactables\Destructables\Destructable.cs" />
     <Compile Include="Interactables\Flag.cs" />
+    <Compile Include="Interactables\ChestKey.cs" />
+    <Compile Include="Interactables\Strawberries\FlyingStrawberry.cs" />
+    <Compile Include="Interactables\Strawberries\Strawberry.cs" />
     <Compile Include="Levels\GameLevel.cs" />
     <Compile Include="GXPEngine\AddOns\Gizmos.cs" />
     <Compile Include="GXPEngine\AddOns\SpriteBatch.cs" />

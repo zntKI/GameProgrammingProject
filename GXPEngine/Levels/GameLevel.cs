@@ -21,14 +21,22 @@ public class GameLevel : Level
     private int timeGameStartMS;
 
     private int deathCount;
+    private int collectedStrawberries;
 
-    public GameLevel(string fileName, int id, int timeGameStartMS, int deathCount) : base(fileName, id)
+    private int currentlyCollectedStrawberries;
+
+    public GameLevel(string fileName, int id, int timeGameStartMS, int deathCount, int collectedStrawberries) : base(fileName, id)
     {
         durationToShowHUD = 1000;
         durationToShowHUDCounter = 0;
 
         this.timeGameStartMS = timeGameStartMS;
         this.deathCount = deathCount;
+
+        this.collectedStrawberries = collectedStrawberries;
+        currentlyCollectedStrawberries = 0;
+
+        CreateLevel();
     }
 
     private void Update()
@@ -80,7 +88,7 @@ public class GameLevel : Level
     {
         if (player.CurrentTriggerCollisions.FirstOrDefault(obj => obj is Flag) != null)
         {
-            hud.ShowEndState(deathCount);
+            hud.ShowEndState(deathCount, collectedStrawberries);
         }
         else
         {
@@ -93,12 +101,14 @@ public class GameLevel : Level
         tiledLoader.rootObject = this;
         tiledLoader.addColliders = false;
         tiledLoader.LoadImageLayers();
-        tiledLoader.LoadTileLayers(1);
-        tiledLoader.LoadObjectGroups(1);
-        tiledLoader.addColliders = true;
-        tiledLoader.autoInstance = true;
         tiledLoader.LoadTileLayers(0);
         tiledLoader.LoadObjectGroups(0);
+        tiledLoader.addColliders = true;
+        tiledLoader.autoInstance = true;
+        tiledLoader.LoadTileLayers(1);
+        if (currentlyCollectedStrawberries == 0)
+            tiledLoader.LoadObjectGroups(1);
+        tiledLoader.LoadObjectGroups(2);
 
         player = FindObjectOfType<Player>();
 
@@ -133,6 +143,9 @@ public class GameLevel : Level
     private void PlayerDie()
     {
         deathCount++;
+        //Sets the var only if the player has currently collected the strawberry
+        if (player.CollectedStrawberries != 0)
+            currentlyCollectedStrawberries = player.CollectedStrawberries;
 
         new Sound("Sounds/die1.wav").Play(false, 0, 0.5f);
         ReloadLevel();
@@ -144,7 +157,6 @@ public class GameLevel : Level
     protected override void LoadLevel()
     {
         int increment = 1;
-        //7 11 17
         if (id + 1 == 7 || id + 1 == 11)
         {
             increment = 2;
@@ -154,11 +166,14 @@ public class GameLevel : Level
             increment = 3;
         }
 
+        if (player.CollectedStrawberries != 0)
+            currentlyCollectedStrawberries = player.CollectedStrawberries;
+
         Level level;
         if (id + 1 != 22)
-            level = new GameLevel($"level{id + increment}.tmx", id + increment, timeGameStartMS, deathCount);
+            level = new GameLevel($"Levels/level{id + increment}.tmx", id + increment, timeGameStartMS, deathCount, collectedStrawberries + currentlyCollectedStrawberries);
         else
-            level = new MenuLevel($"level{id + increment}.tmx", id + increment);
+            level = new MenuLevel($"Levels/level{id + increment}.tmx", id + increment);
 
         Destroy();
 

@@ -12,8 +12,6 @@ public abstract class Level : GameObject
     {
         this.id = id;
         tiledLoader = new TiledLoader(fileName);
-
-        CreateLevel();
     }
 
     protected abstract void CreateLevel();

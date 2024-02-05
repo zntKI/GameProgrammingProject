@@ -19,6 +19,9 @@ public class Player : AnimationSprite
     public GameObject[] CurrentTriggerCollisions => currentTriggerCollisions;
     private GameObject[] currentTriggerCollisions;
 
+    public int CollectedStrawberries => collectedStrawberries;
+    private int collectedStrawberries;
+
     //Vertical movement variables
     private float fallSpeed;
     private float currentFallSpeed;
@@ -759,6 +762,11 @@ public class Player : AnimationSprite
                 ((Balloon)trigger).Destruct();
 
                 new Sound("Sounds/balloon_collect.wav").Play();
+            }
+            else if (trigger is Strawberry)
+            {
+                collectedStrawberries++;
+                trigger.Destroy();
             }
         }
     }
