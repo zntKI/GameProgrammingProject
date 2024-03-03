@@ -765,11 +765,15 @@ public class Player : AnimationSprite
             }
             else if (trigger is Strawberry)
             {
+                new Sound("Sounds/strawberry_collect.wav").Play();
+
                 collectedStrawberries++;
                 trigger.Destroy();
             }
             else if (trigger is ChestKey)
             {
+                new Sound("Sounds/key_collect.wav").Play();
+
                 ((ChestKey)trigger).OpenChest();
             }
         }

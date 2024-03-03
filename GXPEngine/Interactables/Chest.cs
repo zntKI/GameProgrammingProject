@@ -20,6 +20,8 @@ public class Chest : AnimationSprite
         str.SetOrigin(str.width / 2, str.height / 2);
         str.SetXY(this.x, this.y);
 
+        new Sound("Sounds/chest_open.wav").Play();
+
         Destroy();
     }
 }

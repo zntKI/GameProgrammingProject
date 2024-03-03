@@ -11,8 +11,8 @@ public class MyGame : Game
     {
         new Sound("Sounds/main.wav", true, true).Play();
 
-        //AddChild(new GameLevel("Levels/level18.tmx", 18, Time.time, 0, 0));
-        AddChild(new MenuLevel("Levels/level0.tmx", 0));
+        AddChild(new GameLevel("Levels/level5.tmx", 5, Time.time, 0, 0));
+        //AddChild(new MenuLevel("Levels/level0.tmx", 0));
     }
 
     void Update()
