@@ -13,19 +13,20 @@ public class ChestKey : AnimationSprite
 
     private Chest chestToOpen;
 
-    public ChestKey(string filename, int cols, int rows, TiledObject obj=null) : base(filename, cols, rows)
+    public ChestKey(string filename, int cols, int rows, TiledObject obj = null) : base(filename, cols, rows)
     {
         collider.isTrigger = true;
 
         startFrame = 8;
         animDelay = 30;
         SetCycle(startFrame, 3, animDelay);
-
-        chestToOpen = this.parent.FindObjectOfType<Chest>();
     }
 
     private void Update()
     {
+        if (chestToOpen == null)
+            chestToOpen = this.parent.FindObjectOfType<Chest>();
+
         Animate();
     }
 

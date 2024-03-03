@@ -13,8 +13,12 @@ public class Chest : AnimationSprite
     }
 
     public void Destruct()
-    { 
+    {
         //Load strawberry
+        Strawberry str = new Strawberry("Levels/strawberry.png", 1, 1);
+        this.parent.AddChild(str);
+        str.SetOrigin(str.width / 2, str.height / 2);
+        str.SetXY(this.x, this.y);
 
         Destroy();
     }

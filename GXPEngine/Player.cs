@@ -768,6 +768,10 @@ public class Player : AnimationSprite
                 collectedStrawberries++;
                 trigger.Destroy();
             }
+            else if (trigger is ChestKey)
+            {
+                ((ChestKey)trigger).OpenChest();
+            }
         }
     }
 }
