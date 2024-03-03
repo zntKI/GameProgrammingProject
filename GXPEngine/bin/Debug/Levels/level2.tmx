@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="16" height="16" tilewidth="8" tileheight="8" infinite="0" nextlayerid="7" nextobjectid="10">
+ <tileset firstgid="1" name="spritemap" tilewidth="8" tileheight="8" tilecount="176" columns="16">
+  <image source="spritemap.png" width="128" height="88"/>
+ </tileset>
+ <imagelayer id="5" name="Bg">
+  <image source="bg.png" width="128" height="128"/>
+ </imagelayer>
+ <layer id="1" name="BgLayer" width="16" height="16">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,41,41,41,0,
+0,0,0,0,0,0,41,41,0,41,0,0,43,17,41,0,
+0,0,0,0,17,41,42,42,0,41,0,0,0,59,57,0,
+0,0,0,41,41,42,0,0,0,43,0,0,0,0,43,0,
+0,0,0,42,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,59,58,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,17,42,0,0,58,0,0,0,0,89,0,0,
+0,0,0,0,41,58,0,0,41,89,58,0,105,41,0,0,
+0,0,0,0,41,41,104,0,41,41,41,57,41,41,0,0,
+0,0,0,0,0,43,41,0,42,0,43,41,41,0,0,0,
+0,0,0,0,0,59,41,0,0,0,0,0,43,41,41,0,
+0,41,0,0,59,57,42,0,0,0,0,0,0,0,43,0,
+0,43,57,0,41,42,0,0,0,0,0,0,0,0,59,41,
+0,0,43,41,41,104,0,0,0,0,0,0,0,0,57,41,
+0,0,0,0,0,0,0,0,0,0,0,104,89,105,41,41
+</data>
+ </layer>
+ <layer id="2" name="MainLayer" width="16" height="16">
+  <data encoding="csv">
+38,39,38,38,38,39,50,51,51,51,38,39,0,0,0,37,
+38,39,50,51,51,52,0,0,0,0,37,39,0,0,0,37,
+38,38,36,33,0,0,0,0,0,0,37,39,0,0,0,37,
+73,38,39,0,0,0,0,0,0,0,37,52,0,0,0,37,
+38,73,39,0,0,0,0,0,0,0,49,0,0,0,0,37,
+38,51,52,0,0,0,0,0,0,0,56,0,0,0,0,37,
+39,0,0,0,0,0,0,40,0,0,0,0,0,0,34,38,
+38,36,33,33,0,0,0,49,0,0,0,0,0,0,37,73,
+38,38,35,36,0,0,0,56,0,0,0,0,0,0,50,51,
+38,38,73,39,0,0,0,33,0,0,0,0,0,0,34,35,
+73,38,38,39,0,0,0,40,0,0,0,0,0,53,51,38,
+51,51,38,39,0,0,0,49,0,0,0,0,0,0,0,37,
+0,0,50,39,0,0,0,49,0,0,0,0,0,0,0,50,
+0,0,0,56,0,0,0,49,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,37,35,35,36,0,0,0,0,0,
+35,35,35,35,35,35,35,38,38,73,39,0,0,0,0,0
+</data>
+ </layer>
+ <objectgroup id="4" name="ObjectLayerNonInteractable">
+  <object id="1" name="Grass" gid="62" x="16" y="56" width="8" height="8"/>
+  <object id="2" name="Grass" gid="64" x="48" y="120" width="8" height="8"/>
+  <object id="3" name="Flower" gid="63" x="112" y="48" width="8" height="8"/>
+ </objectgroup>
+ <objectgroup id="6" name="Strawberry"/>
+ <objectgroup id="3" name="ObjectLayerInteractable">
+  <object id="4" name="Spikes" type="Spikes" gid="18" x="64" y="112" width="8" height="8"/>
+  <object id="5" name="Spikes" type="Spikes" gid="18" x="72" y="112" width="8" height="8"/>
+  <object id="6" name="Spikes" type="Spikes" gid="18" x="80" y="112" width="8" height="8"/>
+  <object id="8" name="Spikes" type="Spikes" gid="18" x="56" y="48" width="8" height="8"/>
+  <object id="9" name="Player" type="Player" gid="2" x="8" y="120" width="8" height="8"/>
+ </objectgroup>
+</map>

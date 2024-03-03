@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="16" height="16" tilewidth="8" tileheight="8" infinite="0" nextlayerid="5" nextobjectid="27">
+ <tileset firstgid="1" name="spritemap" tilewidth="8" tileheight="8" tilecount="176" columns="16">
+  <image source="spritemap.png" width="128" height="88"/>
+ </tileset>
+ <tileset firstgid="177" name="cloud" tilewidth="16" tileheight="8" tilecount="1" columns="1">
+  <image source="cloud.png" width="16" height="8"/>
+ </tileset>
+ <tileset firstgid="178" name="balloon" tilewidth="8" tileheight="16" tilecount="4" columns="4">
+  <image source="balloon.png" width="32" height="16"/>
+ </tileset>
+ <layer id="2" name="MainLayer" width="16" height="16">
+  <data encoding="csv">
+38,51,51,51,51,51,51,51,38,39,0,0,0,37,73,38,
+39,0,0,0,0,0,0,0,50,52,0,0,0,37,38,38,
+52,0,0,0,0,0,0,0,0,0,0,0,0,50,38,38,
+0,0,34,35,36,0,0,0,0,0,0,0,0,0,37,38,
+0,53,38,38,52,0,0,0,0,0,0,0,0,0,37,38,
+0,0,37,39,0,0,0,0,0,0,0,0,34,35,38,38,
+0,0,37,39,0,0,0,0,0,0,0,0,50,38,73,38,
+0,0,50,52,0,0,0,0,0,0,0,0,0,50,51,38,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,
+0,0,0,0,0,0,34,55,0,0,0,0,0,0,0,0,
+35,54,54,54,54,54,52,0,0,0,0,0,0,0,0,0,
+52,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer id="1" name="BgLayer" width="16" height="16">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,41,41,41,0,0,0,
+0,41,0,0,0,59,41,41,0,0,41,41,57,0,0,0,
+0,41,0,0,0,41,41,41,0,0,41,0,43,0,0,0,
+57,17,0,0,0,41,57,42,0,59,17,42,0,43,0,0,
+41,0,0,0,0,42,43,0,0,0,43,0,0,0,0,0,
+42,0,0,0,41,58,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,42,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,43,41,0,0,0,
+0,0,43,42,0,0,0,0,0,0,0,0,41,41,41,0,
+0,0,0,0,0,0,0,0,0,0,0,0,43,41,57,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,41,41,58,
+0,41,57,41,41,42,0,0,0,0,0,0,0,17,41,41,
+41,41,42,0,43,0,0,0,0,0,0,0,0,41,41,41,
+42,0,0,0,0,0,0,0,0,0,43,104,105,41,42,0,
+0,0,0,0,0,0,0,0,0,0,0,41,41,57,58,59,
+0,0,0,0,0,0,0,0,0,0,59,41,41,41,41,41
+</data>
+ </layer>
+ <objectgroup id="3" name="ObjectLayerInteractable">
+  <object id="1" name="Block" type="Block" gid="24" x="8" y="128" width="8" height="8"/>
+  <object id="2" name="Block" type="Block" gid="24" x="16" y="128" width="8" height="8"/>
+  <object id="3" name="Block" type="Block" gid="24" x="48" y="120" width="8" height="8"/>
+  <object id="4" name="Block" type="Block" gid="24" x="56" y="120" width="8" height="8"/>
+  <object id="5" name="Cloud" type="Cloud" gid="177" x="112" y="80" width="16" height="8">
+   <properties>
+    <property name="isGoingRight" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="6" name="Spikes" type="Spikes" gid="18" x="56" y="72" width="8" height="8"/>
+  <object id="7" name="Spikes" type="Spikes" gid="18" x="48" y="72" width="8" height="8"/>
+  <object id="8" name="Spikes" type="Spikes" gid="18" x="40" y="80" width="8" height="8"/>
+  <object id="9" name="Spikes" type="Spikes" gid="18" x="32" y="80" width="8" height="8"/>
+  <object id="10" name="Spikes" type="Spikes" gid="18" x="24" y="80" width="8" height="8"/>
+  <object id="11" name="Spikes" type="Spikes" gid="18" x="16" y="80" width="8" height="8"/>
+  <object id="12" name="Spikes" type="Spikes" gid="18" x="8" y="80" width="8" height="8"/>
+  <object id="13" name="Spikes" type="Spikes" gid="18" x="0" y="80" width="8" height="8"/>
+  <object id="14" name="Spikes" type="Spikes" gid="18" x="16" y="24" width="8" height="8"/>
+  <object id="15" name="Spikes" type="Spikes" gid="18" x="24" y="24" width="8" height="8"/>
+  <object id="16" name="Spikes" type="Spikes" gid="18" x="32" y="24" width="8" height="8"/>
+  <object id="17" name="Spikes" type="Spikes" gid="18" x="96" y="40" width="8" height="8"/>
+  <object id="18" name="Spikes" type="Spikes" gid="18" x="104" y="40" width="8" height="8"/>
+  <object id="19" name="Spikes" type="Spikes" gid="60" x="8" y="48" width="8" height="8"/>
+  <object id="20" name="Spikes" type="Spikes" gid="60" x="8" y="56" width="8" height="8"/>
+  <object id="21" name="Spikes" type="Spikes" gid="60" x="8" y="64" width="8" height="8"/>
+  <object id="22" name="Spikes" type="Spikes" gid="60" x="88" y="48" width="8" height="8"/>
+  <object id="23" name="Spikes" type="Spikes" gid="60" x="88" y="56" width="8" height="8"/>
+  <object id="25" name="Balloon" type="Balloon" gid="179" x="32" y="23" width="8" height="16"/>
+  <object id="26" name="Player" type="Player" gid="2" x="8" y="120" width="8" height="8"/>
+ </objectgroup>
+ <objectgroup id="4" name="ObjectLayerNonInteractable"/>
+</map>

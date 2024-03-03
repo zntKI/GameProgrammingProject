@@ -17,7 +17,6 @@
 mono_crash.*
 
 # Build results
-[Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
@@ -27,10 +26,14 @@ x86/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
 bld/
-[Bb]in/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
+
+GXPEngine/bin/Debug/GXPEngine.exe
+GXPEngine/bin/Debug/GXPEngine.pdb
+GXPEngine/bin/Debug/GXPEngine.exe.config
+GXPEngine/bin/Debug/GLCache
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
