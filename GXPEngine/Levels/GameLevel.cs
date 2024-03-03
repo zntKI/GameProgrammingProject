@@ -11,6 +11,9 @@ using System.Threading.Tasks;
 /// </summary>
 public class GameLevel : Level
 {
+    private const int numberOfCloudParticles = 20;
+    private const int numberOfSnowParticles = 10;
+
     private Player player;
 
     private HUD hud;
@@ -101,6 +104,10 @@ public class GameLevel : Level
         tiledLoader.rootObject = this;
         tiledLoader.addColliders = false;
         tiledLoader.LoadImageLayers();
+
+        //Load Cloud particles
+        CreateCloudParticles();
+
         tiledLoader.LoadTileLayers(0);
         tiledLoader.LoadObjectGroups(0);
         tiledLoader.addColliders = true;
@@ -112,6 +119,42 @@ public class GameLevel : Level
 
         player = FindObjectOfType<Player>();
 
+        //Load Snow particles
+        CreateSnowParticles();
+
+        CreateHUD();
+    }
+
+    private void CreateCloudParticles()
+    {
+        for (int i = 0; i < numberOfCloudParticles; i++)
+        {
+            Particle cloudParticle = new Particle("Levels/cloudParticle.png", Utils.Random(1f, 2f));
+
+            cloudParticle
+                .SetScale(Utils.Random(8, 31), Utils.Random(3, 16))
+                .SetPos(Utils.Random(0, game.width - cloudParticle.width), Utils.Random(0, game.height - cloudParticle.height));
+
+            AddChild(cloudParticle);
+        }
+    }
+
+    private void CreateSnowParticles()
+    {
+        for (int i = 0; i < numberOfSnowParticles; i++)
+        {
+            SnowParticle snowParticle = new SnowParticle("Levels/snowParticle.png", Utils.Random(1f, 1.6f), Utils.Random(1, 20));
+
+            snowParticle
+                .SetScale(Utils.Random(1, 5))
+                .SetPos(Utils.Random(0, game.width - snowParticle.width), Utils.Random(0, game.height - snowParticle.height));
+
+            AddChild(snowParticle);
+        }
+    }
+
+    private void CreateHUD()
+    {
         if (hud == null)
         {
             //Checks whether to create a special HUD, used only for the last GameLevel

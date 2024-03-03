@@ -94,6 +94,8 @@
     <Compile Include="GXPEngine\FMOD\FMODSoundSystem.cs" />
     <Compile Include="GXPEngine\SoLoud\Soloud.cs" />
     <Compile Include="GXPEngine\SoLoud\SoloudSoundSystem.cs" />
+    <Compile Include="Particles\Particle.cs" />
+    <Compile Include="Particles\SnowParticle.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Interactables\Spikes.cs" />
     <Compile Include="Interactables\Trampoline.cs" />
