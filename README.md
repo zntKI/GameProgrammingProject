@@ -39,6 +39,9 @@ Throughout the course, we studied various concepts concerning Game Programming a
 - **Particles:**
   1. Clouds at the background
   2. Snowflakes
+ 
+### Level editing
+Done by using Tiled level editor
 
 ## Demo
 
@@ -49,20 +52,12 @@ Throughout the course, we studied various concepts concerning Game Programming a
 
 ## Controls
 
-### Aiming
-- **Manual:**
-  1. Aim by **moving the mouse**
-  2. When ready to shoot **press and hold the left mouse button** to adjust shooting power<br/>* *If you want to adjust the angle and you have already started charging, drag the mouse before the initial charge point and release the mouse button*
-  3. **Release** to launch the cue ball
-- **Automatic:**
-  1. Aim by pressing **Q** or **E** to switch between object balls in the corresponding direction
-  2. **Press or hold A or D** to adjust the angle more precisely
-  3. When done adjusting the angle, by pressing **W** or **S**, you can adjust the shooting power
-  4. Finally, press **ENTER** to launch the cue ball
-
-### Spin and cue ball direction
-1. By pressing or holding the arrow keys, you can adjust the spin and the direction of the cue ball
-2. When ready, you can launch the cue ball and test what will happen :)
+- **Moving and looking:**
+  1. Move left or right by pressing **A** or **D**/**LEFT_ARROW_KEY** or **RIGHT_ARROW_KEY** respectively
+  2. Look down or up by pressing **S** or **W**/**DOWN_ARROW_KEY** or **UP_ARROW_KEY** respectively
+- **Jumping/Wall jumping:** Jump by pressing **SPACE**/**C**
+- **Dashing:** Dash by pressing **LEFT_SHIFT**/**X**
+- **Sliding:** Slide by holding the key corresponding to the wall's direction according to the player
 
 ## Art
-From: https://opengameart.org/content/8-ball-pool-assets
+From: https://github.com/NoelFB/Celeste/blob/master/Source/PICO-8/Graphics/atlas.png
