@@ -2,6 +2,11 @@
 
 A project I chose to work on for my Game Programming assignment, which recreates the well-known Celeste (PICO-8) game.
 
+<p align="center">
+  <img src="Media/demo.gif"><br/>
+  *<i>Low frame rate caused by gif limitations</i>*
+</p>
+
 ## Overview
 
 Throughout the course, we studied various concepts concerning Game Programming as a whole, all in the context of the GxP 2D Game Engine, provided by the institution.
@@ -42,13 +47,6 @@ Throughout the course, we studied various concepts concerning Game Programming a
  
 ### Level editing
 Done by using Tiled level editor
-
-## Demo
-
-<p align="center">
-  <img src="Media/demo.gif"><br/>
-  *<i>Low frame rate caused by gif limitations</i>*
-</p>
 
 ## Controls
 
