@@ -46,7 +46,7 @@ Throughout the course, we studied various concepts concerning Game Programming a
   2. Snowflakes
  
 ### Level editing
-Done by using Tiled level editor
+Done by using [Tiled](https://www.mapeditor.org/) level editor
 
 ## Controls
 
