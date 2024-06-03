@@ -24,7 +24,7 @@ Throughout the course, we studied various concepts concerning Game Programming a
 - **Interactables:**
   1. Spikes
   2. Trampoline
-  3. Destructable blocks - start destructing if you step on them
+  3. Destructible blocks - start destructing if you step on them
   4. Balloons - regain your dash ability
 - **Collectables:**
   1. Normal Strawberry
