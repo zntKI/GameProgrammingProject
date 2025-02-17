@@ -9,7 +9,7 @@ A project I chose to work on for my Game Programming assignment, which recreates
 
 ## Overview
 
-Throughout the course, we studied various concepts concerning Game Programming as a whole, all in the context of the GXP 2D Game Engine - a code-based small engine designed and developed by the teachers to introduce students to how a game engine may opperate.
+Throughout the course, we studied various concepts concerning Game Programming as a whole, all in the context of the [GXP 2D Game Engine](https://github.com/zntKI/GameProgrammingProject/tree/main/GXPEngine/GXPEngine) - a code-based small engine designed and developed by the teachers to introduce students to how a game engine may opperate.
 
 ## Features
 
